@@ -6,7 +6,7 @@ One MCP call reads PDF, image, or video by sniffing format and delegating to Syl
 
 - Lifecycle: `bootstrap`
 - Layer: `tooling`
-- Portfolio ADR: [pdf-reader-mcp ADR-0004](https://github.com/SylphxAI/pdf-reader-mcp/blob/main/docs/adr/0004-reader-portfolio-architecture.md)
+- Portfolio ADR: [ADR-0002](docs/adr/0002-reader-portfolio-architecture.md) (this repo)
 
 ## Goals
 
