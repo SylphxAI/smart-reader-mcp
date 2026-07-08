@@ -1,6 +1,6 @@
 {
   "name": "@sylphx/smart-reader-mcp",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "mcpName": "io.github.SylphxAI/smart-reader-mcp",
   "description": "One MCP call reads PDF, image, or video by sniffing format and delegating to Sylphx Reader siblings.",
   "type": "module",
@@ -46,6 +46,7 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "sync:server-json": "bun scripts/sync-server-json.ts",
+    "version-packages": "changeset version && bun run sync:server-json",
     "validate": "bun run check && bun run typecheck && bun run build && bun run test",
     "clean": "rm -rf dist coverage",
     "prepublishOnly": "bun run clean && bun run build",
