@@ -62,13 +62,16 @@ try {
       child.on('exit', (code) => resolve(code === 0));
     });
   });
-  if (hasFfprobe) {
-    const videoFixture = path.resolve(repoRoot, 'test/fixtures/sample.mp4');
-    const videoResult = await callTool(videoEntry, 'read_video', { path: videoFixture });
-    log(`read_video streams: ${videoResult.timeline?.streams?.length ?? 0}`);
-  } else {
-    log('read_video skipped: ffprobe not installed (unit tests cover parsers)');
+  if (!hasFfprobe) {
+    throw new Error('ffprobe is required for read_video launch proof');
   }
+  const videoFixture = path.resolve(repoRoot, 'test/fixtures/sample.mp4');
+  const videoResult = await callTool(videoEntry, 'read_video', {
+    sources: [{ path: videoFixture }],
+  });
+  const videoData = videoResult.results?.[0]?.data;
+  if (!videoData?.streams?.length) throw new Error('read_video returned no stream metadata');
+  log(`read_video streams: ${videoData.streams.length}`);
 } catch (error) {
   log(`FAIL: ${error instanceof Error ? error.message : String(error)}`);
   process.exit(1);

@@ -73,18 +73,20 @@ try {
   if (!imageTwin?.dimensions) throw new Error('Image dimensions missing');
   log(`IMAGE dimensions: ${imageTwin.dimensions.width}x${imageTwin.dimensions.height}`);
 
-  if (await hasFfprobe()) {
-    const videoFixture = path.resolve(repoRoot, 'test/fixtures/sample.mp4');
-    const videoEnvelope = await callReadMedia(videoFixture);
-    log(
-      `VIDEO detected_format=${videoEnvelope.detected_format} delegated_tool=${videoEnvelope.delegated_tool}`
-    );
-    const timeline = videoEnvelope.raw_result?.timeline ?? videoEnvelope.raw_result;
-    if (!timeline?.streams && !timeline?.format) throw new Error('Video timeline metadata missing');
-    log(`VIDEO streams: ${timeline.streams?.length ?? 0}`);
-  } else {
-    log('VIDEO skipped: ffprobe not available in environment');
+  if (!(await hasFfprobe())) {
+    throw new Error('ffprobe is required for video read_media launch proof');
   }
+
+  const videoFixture = path.resolve(repoRoot, 'test/fixtures/sample.mp4');
+  const videoEnvelope = await callReadMedia(videoFixture);
+  log(
+    `VIDEO detected_format=${videoEnvelope.detected_format} delegated_tool=${videoEnvelope.delegated_tool}`
+  );
+  const videoData = videoEnvelope.raw_result?.results?.[0]?.data;
+  if (!videoData?.format || !videoData?.streams?.length) {
+    throw new Error('Video timeline metadata missing');
+  }
+  log(`VIDEO streams: ${videoData.streams.length}`);
 
   const outPath = process.env.SCRATCH
     ? `${process.env.SCRATCH}/read-media-launch.log`

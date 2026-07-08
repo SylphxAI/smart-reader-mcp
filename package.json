@@ -57,9 +57,9 @@
     "zod": "^4.4.3"
   },
   "optionalDependencies": {
-    "@sylphx/pdf-reader-mcp": "*",
-    "@sylphx/image-reader-mcp": "*",
-    "@sylphx/video-reader-mcp": "*"
+    "@sylphx/pdf-reader-mcp": "3.0.14",
+    "@sylphx/image-reader-mcp": "0.1.0",
+    "@sylphx/video-reader-mcp": "0.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",

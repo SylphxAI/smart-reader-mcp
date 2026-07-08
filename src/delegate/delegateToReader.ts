@@ -104,7 +104,7 @@ export const resolveReaderLaunchSpec = (
 };
 
 const buildToolArgs = (category: MediaCategory, sourcePath: string): Record<string, unknown> => {
-  if (category === 'pdf') {
+  if (category === 'pdf' || category === 'video') {
     return { sources: [{ path: sourcePath }] };
   }
   return { path: sourcePath };

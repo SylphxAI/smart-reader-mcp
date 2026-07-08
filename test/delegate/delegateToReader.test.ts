@@ -53,6 +53,27 @@ describe('delegateToReader', () => {
     expect(result.raw_result).toEqual({ ok: true });
   });
 
+  test('builds read_video sources arguments for video delegation', async () => {
+    let capturedArgs: Record<string, unknown> | undefined;
+
+    await delegateToReader({
+      category: 'video',
+      sourcePath: '/tmp/clip.mp4',
+      resolveLaunchSpec: () => ({
+        command: process.execPath,
+        args: ['/tmp/video-reader-mcp'],
+        source: 'local',
+        packageName: '@sylphx/video-reader-mcp',
+      }),
+      callTool: async ({ toolArgs }) => {
+        capturedArgs = toolArgs;
+        return { timeline: { streams: [] } };
+      },
+    });
+
+    expect(capturedArgs).toEqual({ sources: [{ path: '/tmp/clip.mp4' }] });
+  });
+
   test('wraps call failures as ReaderUnavailableError', async () => {
     await expect(
       delegateToReader({
