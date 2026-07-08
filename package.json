@@ -1,0 +1,21 @@
+{
+  "name": "@sylphx/smart-reader-mcp",
+  "version": "0.0.0",
+  "description": "One MCP call reads PDF, image, or video by sniffing format and delegating to Sylphx Reader siblings.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SylphxAI/smart-reader-mcp.git"
+  },
+  "homepage": "https://github.com/SylphxAI/smart-reader-mcp#readme",
+  "keywords": ["mcp", "model-context-protocol", "reader", "evidence", "sylphx"],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"bootstrap: no tests yet\" && exit 0"
+  }
+}

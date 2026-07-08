@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "repo": "SylphxAI/smart-reader-mcp",
+    "name": "Smart Reader MCP",
+    "lifecycle": "bootstrap",
+    "layer": "tooling",
+    "summary": "One MCP call reads PDF, image, or video by sniffing format and delegating to Sylphx Reader siblings."
+  }
+}
