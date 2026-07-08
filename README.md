@@ -4,7 +4,7 @@
 
 **Status:** bootstrap — repository scaffold; MCP tools not shipped yet.
 
-Part of the [Sylphx Reader portfolio](https://github.com/SylphxAI/pdf-reader-mcp/blob/main/docs/adr/0004-reader-portfolio-architecture.md).
+Portfolio architecture (orchestration only): [ADR-0002](docs/adr/0002-reader-portfolio-architecture.md).
 
 | Repository | Role |
 | --- | --- |
