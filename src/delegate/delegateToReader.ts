@@ -5,6 +5,10 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import type { MediaCategory } from '../sniff/formatSniffer.js';
 
 const require = createRequire(import.meta.url);
+const packageJson = require('../../package.json') as {
+  version: string;
+  optionalDependencies?: Record<string, string>;
+};
 
 export type ReaderToolName = 'read_pdf' | 'read_image' | 'read_video';
 
@@ -82,6 +86,11 @@ const resolvePackageEntry = (packageName: string, binName: string): string | nul
   }
 };
 
+export const buildNpxPackageSpecifier = (packageName: string): string => {
+  const pinnedVersion = packageJson.optionalDependencies?.[packageName];
+  return pinnedVersion ? `${packageName}@${pinnedVersion}` : packageName;
+};
+
 export const resolveReaderLaunchSpec = (
   config: ReaderDelegationConfig
 ): ReaderLaunchSpec | null => {
@@ -97,7 +106,7 @@ export const resolveReaderLaunchSpec = (
 
   return {
     command: 'npx',
-    args: ['-y', config.packageName],
+    args: ['-y', buildNpxPackageSpecifier(config.packageName)],
     source: 'npx',
     packageName: config.packageName,
   };
@@ -152,7 +161,7 @@ const defaultCallTool = async (args: {
     args: args.launch.args,
     stderr: 'pipe',
   });
-  const client = new Client({ name: 'smart-reader-mcp', version: '0.1.0' });
+  const client = new Client({ name: 'smart-reader-mcp', version: packageJson.version });
 
   try {
     await client.connect(transport);

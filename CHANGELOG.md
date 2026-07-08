@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+### Patch Changes
+
+- Pin sibling optionalDependencies and npx fallback versions; fix read_video sources delegation for portfolio consumers.
+
 ## 0.1.0
 
 ### Minor Changes

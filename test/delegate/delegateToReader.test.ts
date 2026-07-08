@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import {
+  buildNpxPackageSpecifier,
   delegateToReader,
   READER_DELEGATION,
   ReaderUnavailableError,
@@ -11,6 +12,18 @@ describe('resolveReaderLaunchSpec', () => {
     expect(READER_DELEGATION.pdf.packageName).toBe('@sylphx/pdf-reader-mcp');
     expect(READER_DELEGATION.image.toolName).toBe('read_image');
     expect(READER_DELEGATION.video.binName).toBe('video-reader-mcp');
+  });
+
+  test('pins npx fallback to optionalDependency versions for known siblings', () => {
+    expect(buildNpxPackageSpecifier('@sylphx/pdf-reader-mcp')).toBe(
+      '@sylphx/pdf-reader-mcp@3.0.14'
+    );
+    expect(buildNpxPackageSpecifier('@sylphx/image-reader-mcp')).toBe(
+      '@sylphx/image-reader-mcp@0.1.0'
+    );
+    expect(buildNpxPackageSpecifier('@sylphx/video-reader-mcp')).toBe(
+      '@sylphx/video-reader-mcp@0.1.0'
+    );
   });
 
   test('returns npx launch spec when local package is unavailable', () => {
