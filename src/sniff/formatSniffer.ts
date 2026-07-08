@@ -85,7 +85,8 @@ const sniffFromMagicBytes = (buffer: Buffer): DetectedFormat => {
     return 'image/webp';
   }
   if (
-    (startsWith(buffer, [0x49, 0x49, 0x2a, 0x00]) || startsWith(buffer, [0x4d, 0x4d, 0x00, 0x2a]))
+    startsWith(buffer, [0x49, 0x49, 0x2a, 0x00]) ||
+    startsWith(buffer, [0x4d, 0x4d, 0x00, 0x2a])
   ) {
     return 'image/tiff';
   }

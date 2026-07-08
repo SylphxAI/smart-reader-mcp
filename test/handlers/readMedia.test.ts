@@ -1,7 +1,7 @@
+import { afterEach, describe, expect, test } from 'bun:test';
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { afterEach, describe, expect, test } from 'bun:test';
 import { ReaderUnavailableError } from '../../src/delegate/delegateToReader.js';
 import { createReadMediaHandler } from '../../src/handlers/readMedia.js';
 import type { SniffResult } from '../../src/sniff/formatSniffer.js';

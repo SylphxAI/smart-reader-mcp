@@ -75,12 +75,7 @@ const normalizeToolResult = (result: ToolHandlerResult): CallToolResult => {
   return { content: [result] };
 };
 
-const buildMcpServer = ({
-  name,
-  version,
-  instructions,
-  tools,
-}: CreateServerOptions): McpServer => {
+const buildMcpServer = ({ name, version, instructions, tools }: CreateServerOptions): McpServer => {
   const mcpServer = new McpServer(
     { name, version },
     {

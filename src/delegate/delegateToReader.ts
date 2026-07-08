@@ -74,7 +74,7 @@ const resolvePackageEntry = (packageName: string, binName: string): string | nul
     };
     const binField = packageJson.bin;
     const binRelative =
-      typeof binField === 'string' ? binField : binField?.[binName] ?? binField?.[packageName];
+      typeof binField === 'string' ? binField : (binField?.[binName] ?? binField?.[packageName]);
     if (!binRelative) return null;
     return path.resolve(path.dirname(packageJsonPath), binRelative);
   } catch {
@@ -114,11 +114,11 @@ const parseToolResult = (result: unknown): unknown => {
   if (typeof result !== 'object' || result === null) return result;
 
   const record = result as Record<string, unknown>;
-  if ('structuredContent' in record && record['structuredContent'] !== undefined) {
-    return record['structuredContent'];
+  if ('structuredContent' in record && record.structuredContent !== undefined) {
+    return record.structuredContent;
   }
 
-  const content = record['content'];
+  const content = record.content;
   if (Array.isArray(content)) {
     const textBlock = content.find(
       (block): block is { type: string; text: string } =>
@@ -133,7 +133,7 @@ const parseToolResult = (result: unknown): unknown => {
       } catch {
         return {
           text: textBlock.text,
-          isError: typeof record['isError'] === 'boolean' ? record['isError'] : false,
+          isError: typeof record.isError === 'boolean' ? record.isError : false,
         };
       }
     }

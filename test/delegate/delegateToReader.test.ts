@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import {
+  delegateToReader,
   READER_DELEGATION,
   ReaderUnavailableError,
-  delegateToReader,
   resolveReaderLaunchSpec,
 } from '../../src/delegate/delegateToReader.js';
 

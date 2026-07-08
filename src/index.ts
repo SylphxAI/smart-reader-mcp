@@ -20,7 +20,7 @@ const server = createServer({
 async function main(): Promise<void> {
   await server.start();
 
-  if (process.env['DEBUG_MCP']) {
+  if (process.env.DEBUG_MCP) {
     console.error('[Smart Reader MCP] Server running on stdio');
     console.error('[Smart Reader MCP] Project root:', process.cwd());
   }

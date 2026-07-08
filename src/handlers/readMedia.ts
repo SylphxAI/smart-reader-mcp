@@ -3,7 +3,7 @@ import path from 'node:path';
 import { delegateToReader } from '../delegate/delegateToReader.js';
 import { text, tool, toolError } from '../mcp.js';
 import { type ReadMediaEnvelope, readMediaArgsSchema } from '../schemas/readMedia.js';
-import { sniffFormat, type SniffResult } from '../sniff/formatSniffer.js';
+import { type SniffResult, sniffFormat } from '../sniff/formatSniffer.js';
 
 export interface ReadMediaDependencies {
   sniffFormat?: (filePath: string) => Promise<SniffResult>;
