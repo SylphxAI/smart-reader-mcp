@@ -6,6 +6,8 @@
 
 Portfolio architecture (orchestration only): [ADR-0002](docs/adr/0002-reader-portfolio-architecture.md).
 
+SOTA family roadmap: [docs/roadmap/sota-family-roadmap.md](docs/roadmap/sota-family-roadmap.md).
+
 | Repository | Role |
 | --- | --- |
 | [pdf-reader-mcp](https://github.com/SylphxAI/pdf-reader-mcp) | PDF (production) |
