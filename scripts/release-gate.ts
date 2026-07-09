@@ -78,7 +78,8 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     checks,
     'contract:reader_evidence_dep',
     typeof pkg.dependencies?.['@sylphx/reader-evidence'] === 'string' &&
-      fileExists('node_modules/@sylphx/reader-evidence/src/envelope.ts'),
+      (fileExists('node_modules/@sylphx/reader-evidence/src/envelope.ts') ||
+        fileExists('node_modules/@sylphx/reader-evidence/src/index.ts')),
     'smart-reader depends on @sylphx/reader-evidence shared schema package',
     { dependency: pkg.dependencies?.['@sylphx/reader-evidence'] }
   );
