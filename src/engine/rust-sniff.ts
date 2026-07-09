@@ -45,8 +45,18 @@ export function resolveRustCliBinary(): string {
   return 'smart-reader-cli';
 }
 
+export function isRustCliAvailable(): boolean {
+  return resolveRustCliBinary() !== 'smart-reader-cli';
+}
+
 export function shouldUseRustSniffEngine(): boolean {
-  return process.env.SMART_READER_USE_RUST_SNIFF === '1';
+  if (process.env.SMART_READER_USE_RUST_SNIFF === '0') {
+    return false;
+  }
+  if (process.env.SMART_READER_USE_RUST_SNIFF === '1') {
+    return true;
+  }
+  return isRustCliAvailable();
 }
 
 const invokeRustCli = (tool: string, input: Record<string, unknown>): unknown => {

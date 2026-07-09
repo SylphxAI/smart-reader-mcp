@@ -1,6 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { runDoctor } from '../src/doctor.js';
+import { isRustCliAvailable, sniffFormatViaRustEngine } from '../src/engine/rust-sniff.js';
 
 const ARTIFACT_DIR_ENV = 'MCP_SMART_READER_BENCHMARK_OUTPUT_DIR';
 const DEFAULT_ARTIFACT_DIR = 'benchmark-artifacts';
@@ -126,6 +128,12 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     'Rust smart-reader-core path policy engine is present'
   );
 
+  try {
+    execSync('cargo build --release', { cwd: repoRoot, stdio: 'pipe', timeout: 120_000 });
+  } catch {
+    // Release gate will report boundary failure if the CLI is still unavailable.
+  }
+
   const doctor = runDoctor(pkg.version);
   addCheck(
     checks,
@@ -133,6 +141,33 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     doctor.checks.find((check) => check.id === 'node')?.status === 'ok',
     'doctor reports Node.js runtime is ready',
     { doctorStatus: doctor.status }
+  );
+
+  addCheck(
+    checks,
+    'doctor:rust_sniff_default',
+    doctor.checks.find((check) => check.id === 'rust_sniff_default')?.status === 'ok',
+    'doctor reports Rust sniff/policy routing is enabled by default when the CLI is built',
+    { rustCliAvailable: isRustCliAvailable() }
+  );
+
+  const mislabeledFixture = path.join(repoRoot, 'test/fixtures/mislabeled/png-as-pdf.pdf');
+  let mislabeledFormat: string | undefined;
+  try {
+    if (isRustCliAvailable()) {
+      const sniffed = sniffFormatViaRustEngine(mislabeledFixture);
+      mislabeledFormat = sniffed.format;
+    }
+  } catch {
+    mislabeledFormat = undefined;
+  }
+
+  addCheck(
+    checks,
+    'boundary:rust_sniff_mislabeled',
+    mislabeledFormat === 'image/png',
+    'Rust sniff engine routes mislabeled png-as-pdf.pdf to image/png by magic bytes',
+    { detectedFormat: mislabeledFormat }
   );
 
   const passed = checks.filter((check) => check.status === 'passed').length;

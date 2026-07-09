@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { READER_DELEGATION } from './delegate/delegateToReader.js';
-import { resolveRustCliBinary } from './engine/rust-sniff.js';
+import { isRustCliAvailable, resolveRustCliBinary } from './engine/rust-sniff.js';
 
 const require = createRequire(import.meta.url);
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -77,7 +77,25 @@ const probeRustSniffCli = (): DoctorCheck => {
     id: 'rust_sniff_cli',
     status: 'warn',
     message:
-      'Rust sniff CLI is not built. Run `cargo build --release` to enable SMART_READER_USE_RUST_SNIFF=1.',
+      'Rust sniff CLI is not built. Run `cargo build --release` to route sniffing and path policy through the native engine by default.',
+  };
+};
+
+const probeRustSniffDefault = (): DoctorCheck => {
+  if (isRustCliAvailable()) {
+    return {
+      id: 'rust_sniff_default',
+      status: 'ok',
+      message:
+        'Rust sniff and path policy are enabled by default because the CLI binary is available. Set SMART_READER_USE_RUST_SNIFF=0 to force the TypeScript fallback.',
+    };
+  }
+
+  return {
+    id: 'rust_sniff_default',
+    status: 'warn',
+    message:
+      'TypeScript magic-byte sniffing is active because the Rust CLI is unavailable.',
   };
 };
 
@@ -112,6 +130,7 @@ export function runDoctor(version: string): DoctorReport {
   const checks = [
     probeNode(),
     probeRustSniffCli(),
+    probeRustSniffDefault(),
     probeSiblingPackage('reader_pdf', READER_DELEGATION.pdf.packageName),
     probeSiblingPackage('reader_image', READER_DELEGATION.image.packageName),
     probeSiblingPackage('reader_video', READER_DELEGATION.video.packageName),

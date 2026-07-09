@@ -11,11 +11,19 @@ const mislabeledPath = path.join(import.meta.dirname, 'fixtures', 'mislabeled', 
 describe('rust sniff engine boundary', () => {
   beforeAll(() => {
     execSync('cargo build -q', { cwd: repoRoot, stdio: 'pipe', timeout: 120_000 });
-    process.env.SMART_READER_USE_RUST_SNIFF = '1';
+    delete process.env.SMART_READER_USE_RUST_SNIFF;
   }, 120_000);
 
   afterAll(() => {
     delete process.env.SMART_READER_USE_RUST_SNIFF;
+  });
+
+  it('enables the Rust engine by default when the CLI is built', async () => {
+    const { isRustCliAvailable, shouldUseRustSniffEngine } = await import(
+      '../src/engine/rust-sniff.js'
+    );
+    expect(isRustCliAvailable()).toBe(true);
+    expect(shouldUseRustSniffEngine()).toBe(true);
   });
 
   it('delegates magic-byte sniffing to the Rust CLI', async () => {
