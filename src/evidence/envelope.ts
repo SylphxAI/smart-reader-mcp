@@ -11,4 +11,5 @@ export type {
 
 export { buildReadMediaEnvelope, hashFile } from '@sylphx/reader-evidence';
 
-export type SmartReaderEvidenceEnvelope = import('@sylphx/reader-evidence').AgentEvidenceEnvelope<RoutingDiagnostics>;
+export type SmartReaderEvidenceEnvelope =
+  import('@sylphx/reader-evidence').AgentEvidenceEnvelope<RoutingDiagnostics>;

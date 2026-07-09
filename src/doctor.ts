@@ -94,8 +94,7 @@ const probeRustSniffDefault = (): DoctorCheck => {
   return {
     id: 'rust_sniff_default',
     status: 'warn',
-    message:
-      'TypeScript magic-byte sniffing is active because the Rust CLI is unavailable.',
+    message: 'TypeScript magic-byte sniffing is active because the Rust CLI is unavailable.',
   };
 };
 

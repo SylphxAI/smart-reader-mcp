@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'bun:test';
+import { READER_DELEGATION } from '../../src/delegate/delegateToReader.js';
 import {
   buildRoutingDiagnostics,
   DELEGATION_CONTRACT_VERSION,
 } from '../../src/delegate/delegationContract.js';
-import { READER_DELEGATION } from '../../src/delegate/delegateToReader.js';
 import { buildReadMediaEnvelope } from '../../src/evidence/envelope.js';
 
 describe('agent evidence envelope', () => {
