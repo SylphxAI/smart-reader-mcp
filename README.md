@@ -15,6 +15,8 @@ trust — no manual format routing required.
 
 **Local-first** · **One smart `read_media` call** · **Delegation provenance envelope** · **33 tests**
 
+SOTA family roadmap: [docs/roadmap/sota-family-roadmap.md](docs/roadmap/sota-family-roadmap.md).
+
 [⭐ Star this repo](https://github.com/SylphxAI/smart-reader-mcp) if agents should read any media file without you wiring format switches.
 · [Quick start](#quick-start) · [See it work](#see-it-work) · [Why not manual format routing?](#why-not-manual-format-routing)
 
