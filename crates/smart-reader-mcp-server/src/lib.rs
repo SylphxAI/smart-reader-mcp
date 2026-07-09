@@ -1,0 +1,89 @@
+pub mod read_media;
+pub mod tool_routes;
+
+use rmcp::{
+    handler::server::router::tool::ToolRouter,
+    handler::server::wrapper::Parameters,
+    model::{Implementation, ServerCapabilities, ServerInfo},
+    tool, tool_handler, tool_router, ErrorData, ServerHandler,
+};
+use serde_json::Value;
+
+pub const SERVER_NAME: &str = "smart-reader-mcp";
+pub const SERVER_VERSION: &str = "0.1.1";
+pub const SERVER_INSTRUCTIONS: &str =
+    "Smart reader MCP server (Rust rmcp transport). Use read_media to sniff format and delegate to the matching Sylphx Reader sibling with a provenance envelope.";
+
+#[derive(Clone)]
+pub struct SmartReaderMcp {
+    pub tool_router: ToolRouter<Self>,
+}
+
+impl SmartReaderMcp {
+    pub fn new() -> Self {
+        Self {
+            tool_router: Self::tool_router(),
+        }
+    }
+}
+
+#[tool_router]
+impl SmartReaderMcp {
+    #[tool(
+        description = "Read a local PDF, image, or video by sniffing format and delegating to the matching Sylphx Reader sibling MCP package."
+    )]
+    pub fn read_media(
+        &self,
+        Parameters(args): Parameters<Value>,
+    ) -> Result<rmcp::model::CallToolResult, ErrorData> {
+        read_media::read_media(args)
+    }
+}
+
+#[tool_handler]
+impl ServerHandler for SmartReaderMcp {
+    fn get_info(&self) -> ServerInfo {
+        ServerInfo {
+            protocol_version: rmcp::model::ProtocolVersion::default(),
+            capabilities: ServerCapabilities::builder().enable_tools().build(),
+            server_info: Implementation {
+                name: SERVER_NAME.into(),
+                title: None,
+                version: SERVER_VERSION.into(),
+                description: Some(
+                    "Rust-native MCP server for smart-reader-mcp (modelcontextprotocol/rust-sdk rmcp)"
+                        .into(),
+                ),
+                icons: None,
+                website_url: Some("https://github.com/SylphxAI/smart-reader-mcp".into()),
+            },
+            instructions: Some(SERVER_INSTRUCTIONS.into()),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::SmartReaderMcp;
+    use std::fs;
+    use std::path::PathBuf;
+
+    #[test]
+    fn rmcp_server_sources_route_read_media_through_rust_core() {
+        let src_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("src");
+        let lib_rs = fs::read_to_string(src_dir.join("lib.rs")).expect("read lib.rs");
+        let production_lib = lib_rs.split("#[cfg(test)]").next().unwrap_or(&lib_rs);
+        assert!(production_lib.contains("read_media::read_media"));
+
+        let routes = fs::read_to_string(src_dir.join("tool_routes.rs")).expect("read tool_routes");
+        assert!(routes.contains("read_media"));
+        assert!(routes.contains("RustCore"));
+    }
+
+    #[test]
+    fn exposes_read_media_tool_surface() {
+        let tools = SmartReaderMcp::new().tool_router.list_all();
+        let names: Vec<_> = tools.iter().map(|tool| tool.name.to_string()).collect();
+        assert!(names.contains(&"read_media".to_string()));
+    }
+}

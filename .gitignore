@@ -1,6 +1,7 @@
 node_modules/
 build/
 dist/
+target/
 *.log
 coverage/
 .env*
@@ -11,4 +12,6 @@ docs/.vitepress/dist
 
 # Test Reports
 test-report.junit.xml
+benchmark-artifacts/*.json
+test/fixtures/mislabeled/
 .vercel

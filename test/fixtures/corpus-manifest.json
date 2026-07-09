@@ -1,0 +1,47 @@
+{
+  "profile": "smart_reader_fixture_corpus",
+  "description": "Phase 0 router contract fixtures for sniffing, delegation, and mislabeled routing.",
+  "cases": [
+    {
+      "id": "pdf",
+      "fixture": "sample.pdf",
+      "expects": {
+        "format": "pdf",
+        "delegated_tool": "read_pdf"
+      }
+    },
+    {
+      "id": "image",
+      "fixture": "sample.png",
+      "expects": {
+        "format": "image/png",
+        "delegated_tool": "read_image"
+      }
+    },
+    {
+      "id": "video",
+      "fixture": "sample.mp4",
+      "expects": {
+        "format": "video/mp4",
+        "delegated_tool": "read_video"
+      }
+    },
+    {
+      "id": "mislabeled-png-as-pdf",
+      "fixture": "mislabeled/png-as-pdf.pdf",
+      "expects": {
+        "format": "image/png",
+        "delegated_tool": "read_image",
+        "warning_includes": "routing by content"
+      }
+    },
+    {
+      "id": "unsupported",
+      "fixture": "unsupported/plain.txt",
+      "expects": {
+        "format": "unknown",
+        "error": true
+      }
+    }
+  ]
+}

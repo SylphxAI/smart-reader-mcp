@@ -1,5 +1,6 @@
 import { open } from 'node:fs/promises';
 import path from 'node:path';
+import { shouldUseRustSniffEngine, sniffFormatViaRustEngine } from '../engine/rust-sniff.js';
 
 export type MediaCategory = 'pdf' | 'image' | 'video';
 
@@ -20,6 +21,7 @@ export interface SniffResult {
   category: MediaCategory | 'unknown';
   format: DetectedFormat;
   mimeType: string | null;
+  route?: string;
 }
 
 const EXTENSION_FORMAT: Record<string, DetectedFormat> = {
@@ -111,6 +113,7 @@ const toSniffResult = (format: DetectedFormat): SniffResult => ({
   category: FORMAT_CATEGORY[format],
   format,
   mimeType: FORMAT_MIME[format],
+  route: 'magic-bytes-v1',
 });
 
 export const sniffFormatFromBuffer = (buffer: Buffer, filePath?: string): SniffResult => {
@@ -124,6 +127,10 @@ export const sniffFormatFromBuffer = (buffer: Buffer, filePath?: string): SniffR
 };
 
 export const sniffFormat = async (filePath: string): Promise<SniffResult> => {
+  if (shouldUseRustSniffEngine()) {
+    return sniffFormatViaRustEngine(filePath);
+  }
+
   const handle = await open(filePath, 'r');
   try {
     const buffer = Buffer.alloc(64);

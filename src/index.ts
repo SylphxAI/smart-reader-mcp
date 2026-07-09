@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { createRequire } from 'node:module';
+import { formatDoctorReport, runDoctor } from './doctor.js';
 import { readMedia } from './handlers/readMedia.js';
 import { createServer } from './mcp.js';
 
@@ -18,6 +19,12 @@ const server = createServer({
 });
 
 async function main(): Promise<void> {
+  if (process.argv[2] === 'doctor') {
+    const report = runDoctor(packageJson.version);
+    console.log(formatDoctorReport(report));
+    process.exit(report.status === 'unavailable' ? 1 : 0);
+  }
+
   await server.start();
 
   if (process.env.DEBUG_MCP) {
