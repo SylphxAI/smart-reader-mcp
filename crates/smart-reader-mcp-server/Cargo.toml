@@ -1,0 +1,21 @@
+[package]
+name = "smart-reader-mcp-server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Rust-native MCP server for smart-reader-mcp (rmcp)"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "smart-reader-mcp-server"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1"
+rmcp = { version = "0.16.0", features = ["server", "transport-io"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+smart-reader-core = { path = "../smart-reader-core" }
+tokio = { version = "1", features = ["full"] }

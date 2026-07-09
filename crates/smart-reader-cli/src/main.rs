@@ -1,5 +1,7 @@
 use smart_reader_core::policy::{resolve_media_path, PolicyErrorCode};
-use smart_reader_core::{sniff, ENGINE_NAME, ENGINE_VERSION};
+use smart_reader_core::{
+    read_media_from_value, sniff, ReadMediaErrorCode, ENGINE_NAME, ENGINE_VERSION,
+};
 use serde::Deserialize;
 use std::io::{self, Read};
 use std::path::PathBuf;
@@ -27,11 +29,27 @@ struct ResolveSuccessEnvelope {
 }
 
 #[derive(Debug, serde::Serialize)]
+struct ReadMediaSuccessEnvelope {
+    status: &'static str,
+    engine: &'static str,
+    version: &'static str,
+    route: &'static str,
+    envelope: smart_reader_core::envelope::AgentEvidenceEnvelope,
+}
+
+#[derive(Debug, serde::Serialize)]
 struct ErrorEnvelope {
     status: &'static str,
     code: String,
     message: String,
     next_action: String,
+}
+
+fn read_media_code(code: ReadMediaErrorCode) -> &'static str {
+    match code {
+        ReadMediaErrorCode::InvalidParams => "INVALID_PARAMS",
+        ReadMediaErrorCode::InvalidRequest => "INVALID_REQUEST",
+    }
 }
 
 fn policy_code(code: PolicyErrorCode) -> &'static str {
@@ -134,6 +152,23 @@ fn main() {
     };
 
     let output = match request.tool.as_str() {
+        "read_media" => match read_media_from_value(&request.input) {
+            Ok(success) => serde_json::to_string(&ReadMediaSuccessEnvelope {
+                status: success.status,
+                engine: success.engine,
+                version: success.version,
+                route: success.route,
+                envelope: success.envelope,
+            })
+            .expect("serialize"),
+            Err(error) => serde_json::to_string(&ErrorEnvelope {
+                status: "error",
+                code: read_media_code(error.code).into(),
+                message: error.message,
+                next_action: "Provide a supported local media file and built sibling reader CLIs.".into(),
+            })
+            .expect("serialize"),
+        },
         "sniff_format" => match handle_sniff_format(&request.input) {
             Ok(success) => serde_json::to_string(&success).expect("serialize"),
             Err(error) => serde_json::to_string(&error).expect("serialize"),
@@ -146,7 +181,7 @@ fn main() {
             status: "error",
             code: "UNSUPPORTED_TOOL".into(),
             message: format!("Unsupported tool: {other}"),
-            next_action: "Use sniff_format or resolve_media_path.".into(),
+            next_action: "Use read_media, sniff_format, or resolve_media_path.".into(),
         })
         .expect("serialize"),
     };

@@ -1,5 +1,9 @@
 [workspace]
-members = ["crates/smart-reader-core", "crates/smart-reader-cli"]
+members = [
+    "crates/smart-reader-core",
+    "crates/smart-reader-cli",
+    "crates/smart-reader-mcp-server",
+]
 resolver = "2"
 
 [workspace.package]

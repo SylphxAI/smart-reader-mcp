@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 pub const SNIFF_ROUTE: &str = "rust-sniff";
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum MediaCategory {
     Pdf,

@@ -9,9 +9,10 @@
   },
   "license": "MIT",
   "bin": {
-    "smart-reader-mcp": "./dist/index.js"
+    "smart-reader-mcp": "./bin/smart-reader-mcp"
   },
   "files": [
+    "bin/",
     "dist/",
     "README.md",
     "LICENSE"
@@ -38,6 +39,8 @@
     "node": ">=22.13.0"
   },
   "scripts": {
+    "build:rust": "cargo build --release -p smart-reader-core -p smart-reader-cli -p smart-reader-mcp-server && bun scripts/stage-rust-mcp.ts",
+    "test:rust": "cargo test",
     "build": "tsc --project tsconfig.build.json",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",

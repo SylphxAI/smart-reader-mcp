@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { execSync, spawnSync } from 'node:child_process';
 import { DELEGATION_CONTRACT_VERSION } from '../src/delegate/delegationContract.js';
 import { runDoctor } from '../src/doctor.js';
 import { isRustCliAvailable, sniffFormatViaRustEngine } from '../src/engine/rust-sniff.js';
@@ -207,6 +207,56 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     'Sample envelope documents routing diagnostics with non-selected reader alternatives',
     { alternativeCount: sampleEnvelope.routing?.alternatives?.length }
   );
+
+  const binWrapper = readFileSync(path.join(repoRoot, 'bin/smart-reader-mcp'), 'utf8');
+  addCheck(
+    checks,
+    'mcp:rust_adapter_default',
+    binWrapper.includes('smart-reader-mcp-server') &&
+      binWrapper.includes('resolve_rust_bin') &&
+      binWrapper.includes('use_ts_transport'),
+    'Default npm bin launches the Rust rmcp MCP server; TypeScript adapter is opt-in only'
+  );
+
+  const matrixProbe = spawnSync('bun', ['test', 'test/shippedPath.matrix.test.ts'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      SMART_READER_ALLOW_LEGACY_ENGINE: '',
+    },
+    timeout: 300_000,
+  });
+  addCheck(
+    checks,
+    'boundary:rust_cli_engine',
+    fileExists('crates/smart-reader-mcp-server/src/tool_routes.rs') && matrixProbe.status === 0,
+    'Shipped-path matrix test proves primary tools route through Rust core without legacy runtime',
+    matrixProbe.status === 0
+      ? { exitCode: 0 }
+      : {
+          exitCode: matrixProbe.status,
+          stderr: matrixProbe.stderr?.slice(-2000),
+          stdout: matrixProbe.stdout?.slice(-2000),
+        }
+  );
+
+  try {
+    execSync('cargo build --release -p smart-reader-mcp-server', {
+      cwd: repoRoot,
+      stdio: 'pipe',
+      timeout: 300_000,
+    });
+    addCheck(
+      checks,
+      'rust:mcp_server_crate',
+      fileExists('target/release/smart-reader-mcp-server'),
+      'smart-reader-mcp-server rmcp crate builds for release'
+    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    addCheck(checks, 'rust:mcp_server_crate', false, `smart-reader-mcp-server build failed: ${message}`);
+  }
 
   const passed = checks.filter((check) => check.status === 'passed').length;
   const failed = checks.length - passed;
