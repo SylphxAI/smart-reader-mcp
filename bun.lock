@@ -6,7 +6,7 @@
       "name": "@sylphx/smart-reader-mcp",
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.29.0",
-        "@sylphx/reader-evidence": "file:../reader-evidence",
+        "@sylphx/reader-evidence": "github:SylphxAI/reader-evidence",
         "zod": "^4.4.3",
       },
       "devDependencies": {
@@ -179,7 +179,7 @@
 
     "@sylphx/pdf-reader-mcp": ["@sylphx/pdf-reader-mcp@3.0.14", "", { "dependencies": { "@modelcontextprotocol/sdk": "^1.29.0", "pdfjs-dist": "^6.0.227", "pngjs": "^7.0.0", "zod": "^4.4.3" }, "bin": { "pdf-reader-mcp": "dist/index.js" } }, "sha512-jY+Y4WN2K9stRt3HM3CBbAOj0Abx8k4c4LJI+Bp+hmAGYffyyfCjBcMoiJXqFyDJBHAw8QZK4ERU1eQU7UfPzw=="],
 
-    "@sylphx/reader-evidence": ["@sylphx/reader-evidence@file:../reader-evidence", {}],
+    "@sylphx/reader-evidence": ["@sylphx/reader-evidence@github:SylphxAI/reader-evidence#c19a220", {}, "SylphxAI-reader-evidence-c19a220", "sha512-z+8KK6jKLhfAyM0WtVQpfImfPITXTn7H7rri9RjUAJigJnJDZVZEhwK9HaUswUriLULQQJj1wcvTErRixbxy1w=="],
 
     "@sylphx/video-reader-mcp": ["@sylphx/video-reader-mcp@0.1.0", "", { "dependencies": { "@modelcontextprotocol/sdk": "^1.29.0", "zod": "^4.4.3" }, "bin": { "video-reader-mcp": "dist/index.js" } }, "sha512-WX0HGvUt636nNBXQkYnj1ZqPUz3fXXqASnhckaRaHSvX/6XYVNas4o4preiHFLTUcCHlaP3tP+Va6PqOrpGKUA=="],
 
