@@ -73,11 +73,16 @@ describe('rust sniff engine boundary', () => {
     }
     const envelope = JSON.parse(responseText) as {
       route: { sniff: string };
-      delegation: { detected_format: string };
+      delegation: { detected_format: string; contract_version: string };
+      routing: { sniff_method: string; selected_category: string; selection_reason: string };
     };
 
     expect(envelope.route.sniff).toBe('rust-sniff');
     expect(envelope.delegation.detected_format).toBe('image/png');
+    expect(envelope.delegation.contract_version).toBe('smart-reader-delegation-v1');
+    expect(envelope.routing.sniff_method).toBe('rust-sniff');
+    expect(envelope.routing.selected_category).toBe('image');
+    expect(envelope.routing.selection_reason).toContain('overrides declared extension');
   });
 
   it('keeps sniff logic out of the TypeScript adapter sources', () => {

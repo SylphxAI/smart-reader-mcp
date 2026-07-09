@@ -16,23 +16,30 @@ export interface ReaderDelegationConfig {
   packageName: string;
   binName: string;
   toolName: ReaderToolName;
+  contractVersion: string;
 }
+
+const readerContractVersion = (packageName: string): string =>
+  packageJson.optionalDependencies?.[packageName] ?? 'unpinned';
 
 export const READER_DELEGATION: Record<MediaCategory, ReaderDelegationConfig> = {
   pdf: {
     packageName: '@sylphx/pdf-reader-mcp',
     binName: 'pdf-reader-mcp',
     toolName: 'read_pdf',
+    contractVersion: readerContractVersion('@sylphx/pdf-reader-mcp'),
   },
   image: {
     packageName: '@sylphx/image-reader-mcp',
     binName: 'image-reader-mcp',
     toolName: 'read_image',
+    contractVersion: readerContractVersion('@sylphx/image-reader-mcp'),
   },
   video: {
     packageName: '@sylphx/video-reader-mcp',
     binName: 'video-reader-mcp',
     toolName: 'read_video',
+    contractVersion: readerContractVersion('@sylphx/video-reader-mcp'),
   },
 };
 

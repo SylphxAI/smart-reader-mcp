@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
+import { DELEGATION_CONTRACT_VERSION } from '../src/delegate/delegationContract.js';
 import { runDoctor } from '../src/doctor.js';
 import { isRustCliAvailable, sniffFormatViaRustEngine } from '../src/engine/rust-sniff.js';
 
@@ -168,6 +169,30 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     mislabeledFormat === 'image/png',
     'Rust sniff engine routes mislabeled png-as-pdf.pdf to image/png by magic bytes',
     { detectedFormat: mislabeledFormat }
+  );
+
+  const sampleEnvelope = readJson('examples/sample-envelope.json') as {
+    delegation?: { contract_version?: string };
+    routing?: { contract_version?: string; alternatives?: unknown[] };
+  };
+  addCheck(
+    checks,
+    'contract:delegation_version',
+    sampleEnvelope.delegation?.contract_version === DELEGATION_CONTRACT_VERSION &&
+      sampleEnvelope.routing?.contract_version === DELEGATION_CONTRACT_VERSION,
+    'Sample envelope documents the versioned smart-reader delegation contract',
+    {
+      delegationContract: sampleEnvelope.delegation?.contract_version,
+      routingContract: sampleEnvelope.routing?.contract_version,
+    }
+  );
+
+  addCheck(
+    checks,
+    'contract:routing_diagnostics',
+    (sampleEnvelope.routing?.alternatives?.length ?? 0) >= 2,
+    'Sample envelope documents routing diagnostics with non-selected reader alternatives',
+    { alternativeCount: sampleEnvelope.routing?.alternatives?.length }
   );
 
   const passed = checks.filter((check) => check.status === 'passed').length;

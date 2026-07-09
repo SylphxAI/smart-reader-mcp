@@ -1,6 +1,10 @@
 import { access } from 'node:fs/promises';
 import path from 'node:path';
-import { delegateToReader } from '../delegate/delegateToReader.js';
+import {
+  buildRoutingDiagnostics,
+  DELEGATION_CONTRACT_VERSION,
+} from '../delegate/delegationContract.js';
+import { delegateToReader, READER_DELEGATION } from '../delegate/delegateToReader.js';
 import { resolveMediaPathViaRustEngine, shouldUseRustSniffEngine } from '../engine/rust-sniff.js';
 import { buildReadMediaEnvelope, hashFile } from '../evidence/envelope.js';
 import { text, tool, toolError } from '../mcp.js';
@@ -57,10 +61,21 @@ export const createReadMediaHandler = (dependencies: ReadMediaDependencies = {})
 
         const sourceHash = await hashFile(sourcePath);
         const mislabel = mislabelWarning(sourcePath, sniffed);
+        const readerConfig = READER_DELEGATION[sniffed.category as keyof typeof READER_DELEGATION];
+        const routing = buildRoutingDiagnostics({
+          sniffed,
+          sourcePath,
+          launch: delegated.launch,
+          selectedConfig: readerConfig,
+        });
         const envelope = buildReadMediaEnvelope({
           sourcePath,
           detectedFormat: sniffed.format,
           delegatedTool: delegated.delegated_tool,
+          readerPackage: readerConfig.packageName,
+          readerContractVersion: readerConfig.contractVersion,
+          delegationContractVersion: DELEGATION_CONTRACT_VERSION,
+          routing,
           rawResult: delegated.raw_result,
           sourceHash,
           sniffRoute: sniffed.route ?? 'magic-bytes-v1',

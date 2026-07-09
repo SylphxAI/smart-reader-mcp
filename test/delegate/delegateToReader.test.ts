@@ -12,6 +12,9 @@ describe('resolveReaderLaunchSpec', () => {
     expect(READER_DELEGATION.pdf.packageName).toBe('@sylphx/pdf-reader-mcp');
     expect(READER_DELEGATION.image.toolName).toBe('read_image');
     expect(READER_DELEGATION.video.binName).toBe('video-reader-mcp');
+    expect(READER_DELEGATION.pdf.contractVersion).toBe('3.0.14');
+    expect(READER_DELEGATION.image.contractVersion).toBe('0.1.0');
+    expect(READER_DELEGATION.video.contractVersion).toBe('0.1.0');
   });
 
   test('pins npx fallback to optionalDependency versions for known siblings', () => {
@@ -31,6 +34,7 @@ describe('resolveReaderLaunchSpec', () => {
       packageName: '@sylphx/definitely-missing-reader-mcp',
       binName: 'missing-reader-mcp',
       toolName: 'read_pdf',
+      contractVersion: 'unpinned',
     });
 
     expect(launch).toEqual({

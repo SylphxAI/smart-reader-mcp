@@ -12,9 +12,37 @@
     "Re-run read_media after file changes to refresh sourceHash"
   ],
   "delegation": {
+    "contract_version": "smart-reader-delegation-v1",
     "source_path": "/absolute/path/to/report.pdf",
     "detected_format": "pdf",
-    "delegated_tool": "read_pdf"
+    "delegated_tool": "read_pdf",
+    "reader_package": "@sylphx/pdf-reader-mcp",
+    "reader_contract_version": "3.0.14"
+  },
+  "routing": {
+    "contract_version": "smart-reader-delegation-v1",
+    "sniff_method": "magic-bytes-v1",
+    "selected_category": "pdf",
+    "selection_reason": "Sniffed format pdf maps to the pdf reader read_pdf.",
+    "declared_extension": ".pdf",
+    "alternatives": [
+      {
+        "category": "image",
+        "delegated_tool": "read_image",
+        "reader_package": "@sylphx/image-reader-mcp",
+        "reader_contract_version": "0.1.0",
+        "reason": "Not selected: detected format pdf does not map to image."
+      },
+      {
+        "category": "video",
+        "delegated_tool": "read_video",
+        "reader_package": "@sylphx/video-reader-mcp",
+        "reader_contract_version": "0.1.0",
+        "reason": "Not selected: detected format pdf does not map to video."
+      }
+    ],
+    "launch_source": "local",
+    "reader_package": "@sylphx/pdf-reader-mcp"
   },
   "result": {}
 }

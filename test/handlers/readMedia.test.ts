@@ -58,7 +58,18 @@ describe('readMedia handler', () => {
       sourceHash: string;
       locator: { path: string; detectedFormat: string };
       route: { sniff: string; delegation: string };
-      delegation: { delegated_tool: string; detected_format: string; source_path: string };
+      delegation: {
+        contract_version: string;
+        delegated_tool: string;
+        detected_format: string;
+        source_path: string;
+        reader_package: string;
+      };
+      routing: {
+        selected_category: string;
+        selection_reason: string;
+        alternatives: Array<{ category: string; reason: string }>;
+      };
       result: { pages: number; title: string };
       nextActions: string[];
     };
@@ -66,6 +77,10 @@ describe('readMedia handler', () => {
     expect(envelope.subject).toBe(path.resolve(filePath));
     expect(envelope.locator.detectedFormat).toBe('pdf');
     expect(envelope.delegation.delegated_tool).toBe('read_pdf');
+    expect(envelope.delegation.contract_version).toBe('smart-reader-delegation-v1');
+    expect(envelope.delegation.reader_package).toBe('@sylphx/pdf-reader-mcp');
+    expect(envelope.routing.selected_category).toBe('pdf');
+    expect(envelope.routing.alternatives).toHaveLength(2);
     expect(envelope.route.delegation).toBe('read_pdf');
     expect(envelope.sourceHash).toMatch(/^[a-f0-9]{64}$/);
     expect(envelope.result.pages).toBe(1);
@@ -124,10 +139,13 @@ describe('readMedia handler', () => {
     const envelope = JSON.parse(responseText!) as {
       warnings: string[];
       delegation: { delegated_tool: string; detected_format: string };
+      routing: { selection_reason: string; selected_category: string };
     };
 
     expect(envelope.delegation.delegated_tool).toBe('read_image');
     expect(envelope.delegation.detected_format).toBe('image/png');
+    expect(envelope.routing.selected_category).toBe('image');
+    expect(envelope.routing.selection_reason).toContain('overrides declared extension');
     expect(envelope.warnings.some((warning) => warning.includes('routing by content'))).toBe(true);
   });
 

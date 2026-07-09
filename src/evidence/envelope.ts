@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import type { RoutingDiagnostics } from '../delegate/delegationContract.js';
 
 export type Confidence = 'deterministic' | 'derived' | 'inferred' | 'unknown';
 
@@ -23,10 +24,14 @@ export interface AgentEvidenceEnvelope {
   warnings: string[];
   nextActions: string[];
   delegation: {
+    contract_version: string;
     source_path: string;
     detected_format: string;
     delegated_tool: string;
+    reader_package: string;
+    reader_contract_version: string;
   };
+  routing: RoutingDiagnostics;
   result: unknown;
 }
 
@@ -39,6 +44,10 @@ export function buildReadMediaEnvelope(input: {
   sourcePath: string;
   detectedFormat: string;
   delegatedTool: string;
+  readerPackage: string;
+  readerContractVersion: string;
+  delegationContractVersion: string;
+  routing: RoutingDiagnostics;
   rawResult: unknown;
   sourceHash?: string;
   sniffRoute?: string;
@@ -68,10 +77,14 @@ export function buildReadMediaEnvelope(input: {
       'Re-run read_media after file changes to refresh sourceHash',
     ],
     delegation: {
+      contract_version: input.delegationContractVersion,
       source_path: input.sourcePath,
       detected_format: input.detectedFormat,
       delegated_tool: input.delegatedTool,
+      reader_package: input.readerPackage,
+      reader_contract_version: input.readerContractVersion,
     },
+    routing: input.routing,
     result: input.rawResult,
   };
 }
