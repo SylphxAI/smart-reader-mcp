@@ -22,9 +22,16 @@ reader diagnostics, and normalized reader envelopes.
 
 - PDF, image, and video extraction remain in their specialist repos.
 - Rust is the target for sniffing, path normalization, symlink policy, hashing,
-  archive limits, and delegation policy.
+  archive limits, delegation policy, and MCP serving through
+  `modelcontextprotocol/rust-sdk` / `rmcp`.
 - More formats are added only after specialist contracts exist.
 - Router outputs must preserve child reader evidence without lossy wrapping.
+
+## Amendment: Rust-Native MCP Runtime
+
+The family runtime direction now targets Rust MCP servers. Smart Reader MCP may
+keep TypeScript compatibility wrappers during migration, but the target MCP
+server runtime is Rust with `rmcp`.
 
 ## Verification
 

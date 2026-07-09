@@ -34,8 +34,11 @@ normalized output, and actionable install diagnostics.
 ## Runtime Direction
 
 Rust should own format sniffing, path normalization, symlink policy, source
-hashing, archive limits, cache keys, and delegation policy. The MCP adapter can
-stay thin until direct Rust serving is mature.
+hashing, archive limits, cache keys, delegation policy, and MCP serving through
+`modelcontextprotocol/rust-sdk` / `rmcp`.
+
+TypeScript can remain only for generated clients, compatibility wrappers, and
+package-transition tests. It is not the target MCP adapter runtime.
 
 WASM is useful for sandboxed format probes or extension extractors only after
 host capability policy is defined.
@@ -55,6 +58,7 @@ host capability policy is defined.
 - Implement byte-based format detection.
 - Add path normalization, symlink escape, size limit, and binary detection tests.
 - Add source hashing and cache-key primitives.
+- Add Rust MCP handlers for `read_media` routing and delegation diagnostics.
 - Add install diagnostics for missing sibling readers.
 
 ### Phase 2: Normalized Evidence Envelope
