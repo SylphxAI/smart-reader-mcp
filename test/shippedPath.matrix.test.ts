@@ -7,7 +7,10 @@ import path from 'node:path';
 const repoRoot = path.resolve(import.meta.dirname, '..');
 const rustCliBin = path.join(repoRoot, 'target/release/smart-reader-cli');
 const mislabeledPath = path.join(repoRoot, 'test/fixtures/mislabeled/png-as-pdf.pdf');
-const imageReaderCli = path.resolve(repoRoot, '../image-reader-mcp/target/release/image-reader-cli');
+const imageReaderCli = path.resolve(
+  repoRoot,
+  '../image-reader-mcp/target/release/image-reader-cli'
+);
 
 type CliEnvelope = {
   status?: string;

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'bun:test';
+import { READER_DELEGATION } from '../../src/delegate/delegateToReader.js';
 import {
   buildRoutingDiagnostics,
   DELEGATION_CONTRACT_VERSION,
 } from '../../src/delegate/delegationContract.js';
-import { READER_DELEGATION } from '../../src/delegate/delegateToReader.js';
 
 describe('delegation contract routing diagnostics', () => {
   it('records versioned contract metadata and non-selected reader alternatives', () => {

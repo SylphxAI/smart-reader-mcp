@@ -1,10 +1,10 @@
 import { access } from 'node:fs/promises';
 import path from 'node:path';
+import { delegateToReader, READER_DELEGATION } from '../delegate/delegateToReader.js';
 import {
   buildRoutingDiagnostics,
   DELEGATION_CONTRACT_VERSION,
 } from '../delegate/delegationContract.js';
-import { delegateToReader, READER_DELEGATION } from '../delegate/delegateToReader.js';
 import { resolveMediaPathViaRustEngine, shouldUseRustSniffEngine } from '../engine/rust-sniff.js';
 import { buildReadMediaEnvelope, hashFile } from '../evidence/envelope.js';
 import { text, tool, toolError } from '../mcp.js';

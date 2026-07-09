@@ -2,8 +2,8 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { MediaCategory, SniffResult } from '../sniff/formatSniffer.js';
 import {
-  type ReaderDelegationConfig,
   READER_DELEGATION,
+  type ReaderDelegationConfig,
   type ReaderLaunchSpec,
   type ReaderToolName,
 } from './delegateToReader.js';
