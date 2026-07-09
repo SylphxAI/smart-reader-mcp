@@ -1,3 +1,4 @@
+pub mod http_transport;
 pub mod read_media;
 pub mod tool_routes;
 
@@ -85,5 +86,16 @@ mod tests {
         let tools = SmartReaderMcp::new().tool_router.list_all();
         let names: Vec<_> = tools.iter().map(|tool| tool.name.to_string()).collect();
         assert!(names.contains(&"read_media".to_string()));
+    }
+
+    #[test]
+    fn rust_http_transport_module_is_wired_for_web_mcp() {
+        let src_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("src");
+        let main_rs = fs::read_to_string(src_dir.join("main.rs")).expect("read main.rs");
+        let http_rs =
+            fs::read_to_string(src_dir.join("http_transport.rs")).expect("read http_transport.rs");
+        assert!(main_rs.contains("http_transport::serve_http"));
+        assert!(http_rs.contains("StreamableHttpService"));
+        assert!(http_rs.contains("/mcp/health"));
     }
 }
