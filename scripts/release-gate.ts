@@ -56,7 +56,11 @@ const readJson = (relativePath: string): unknown =>
 
 export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
   const checks: GateCheck[] = [];
-  const pkg = readJson('package.json') as { version: string; bin?: Record<string, string> };
+  const pkg = readJson('package.json') as {
+    version: string;
+    bin?: Record<string, string>;
+    dependencies?: Record<string, string>;
+  };
   const manifest = readJson('test/fixtures/corpus-manifest.json') as {
     profile: string;
     cases: Array<{ id: string }>;
@@ -68,6 +72,15 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     typeof pkg.bin?.['smart-reader-mcp'] === 'string',
     'package.json exposes the smart-reader-mcp bin entry',
     { bin: pkg.bin?.['smart-reader-mcp'] }
+  );
+
+  addCheck(
+    checks,
+    'contract:reader_evidence_dep',
+    typeof pkg.dependencies?.['@sylphx/reader-evidence'] === 'string' &&
+      fileExists('node_modules/@sylphx/reader-evidence/src/envelope.ts'),
+    'smart-reader depends on @sylphx/reader-evidence shared schema package',
+    { dependency: pkg.dependencies?.['@sylphx/reader-evidence'] }
   );
 
   addCheck(
