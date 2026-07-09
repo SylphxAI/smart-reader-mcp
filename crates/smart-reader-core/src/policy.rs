@@ -1,0 +1,93 @@
+use std::path::{Component, Path, PathBuf};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PolicyErrorCode {
+    InvalidParams,
+    InvalidRequest,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PolicyError {
+    pub code: PolicyErrorCode,
+    pub message: String,
+}
+
+impl PolicyError {
+    fn invalid_params(message: impl Into<String>) -> Self {
+        Self {
+            code: PolicyErrorCode::InvalidParams,
+            message: message.into(),
+        }
+    }
+
+    fn invalid_request(message: impl Into<String>) -> Self {
+        Self {
+            code: PolicyErrorCode::InvalidRequest,
+            message: message.into(),
+        }
+    }
+}
+
+pub fn resolve_media_path(user_path: &str, cwd: &Path) -> Result<PathBuf, PolicyError> {
+    if user_path.trim().is_empty() {
+        return Err(PolicyError::invalid_params("Path must not be empty."));
+    }
+
+    if user_path.contains('\0') {
+        return Err(PolicyError::invalid_params("Path contains invalid null bytes."));
+    }
+
+    let path = Path::new(user_path);
+    if path
+        .components()
+        .any(|component| matches!(component, Component::ParentDir))
+    {
+        return Err(PolicyError::invalid_request(
+            "Path traversal with '..' is not allowed.",
+        ));
+    }
+
+    let absolute = if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        cwd.join(path)
+    };
+
+    let canonical = std::fs::canonicalize(&absolute).map_err(|err| {
+        PolicyError::invalid_request(format!("File not found or not readable: {err}"))
+    })?;
+
+    let meta = std::fs::metadata(&canonical).map_err(|err| {
+        PolicyError::invalid_request(format!("Unable to stat resolved media path: {err}"))
+    })?;
+
+    if !meta.is_file() {
+        return Err(PolicyError::invalid_request(
+            "Resolved path is not a regular file.",
+        ));
+    }
+
+    Ok(canonical)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    #[test]
+    fn resolves_existing_relative_paths() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let file = temp.path().join("clip.mp4");
+        fs::write(&file, b"demo").expect("write");
+        let resolved = resolve_media_path("clip.mp4", temp.path()).expect("resolve");
+        assert_eq!(resolved, file.canonicalize().expect("canonicalize"));
+    }
+
+    #[test]
+    fn rejects_parent_traversal() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let err = resolve_media_path("../outside.txt", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidRequest);
+    }
+}

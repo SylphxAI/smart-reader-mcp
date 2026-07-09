@@ -112,6 +112,20 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     'examples/read-media-unsupported.json documents unsupported format handling'
   );
 
+  addCheck(
+    checks,
+    'rust:sniff_core',
+    fileExists('crates/smart-reader-core/src/sniff.rs'),
+    'Rust smart-reader-core sniff engine is present'
+  );
+
+  addCheck(
+    checks,
+    'rust:policy_core',
+    fileExists('crates/smart-reader-core/src/policy.rs'),
+    'Rust smart-reader-core path policy engine is present'
+  );
+
   const doctor = runDoctor(pkg.version);
   addCheck(
     checks,

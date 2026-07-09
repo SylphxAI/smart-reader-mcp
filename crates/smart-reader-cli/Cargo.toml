@@ -1,0 +1,15 @@
+[package]
+name = "smart-reader-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "JSON CLI for smart-reader-core"
+
+[[bin]]
+name = "smart-reader-cli"
+path = "src/main.rs"
+
+[dependencies]
+smart-reader-core = { path = "../smart-reader-core" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

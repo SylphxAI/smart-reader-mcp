@@ -1,6 +1,7 @@
 import { access } from 'node:fs/promises';
 import path from 'node:path';
 import { delegateToReader } from '../delegate/delegateToReader.js';
+import { resolveMediaPathViaRustEngine, shouldUseRustSniffEngine } from '../engine/rust-sniff.js';
 import { buildReadMediaEnvelope, hashFile } from '../evidence/envelope.js';
 import { text, tool, toolError } from '../mcp.js';
 import { readMediaArgsSchema } from '../schemas/readMedia.js';
@@ -22,12 +23,22 @@ export const createReadMediaHandler = (dependencies: ReadMediaDependencies = {})
     )
     .input(readMediaArgsSchema)
     .handler(async ({ input }) => {
-      const sourcePath = path.resolve(input.path);
-
+      let sourcePath: string;
       try {
-        await access(sourcePath);
-      } catch {
-        return toolError(`File not found or not readable: ${sourcePath}`);
+        sourcePath = shouldUseRustSniffEngine()
+          ? resolveMediaPathViaRustEngine(input.path)
+          : path.resolve(input.path);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return toolError(message);
+      }
+
+      if (!shouldUseRustSniffEngine()) {
+        try {
+          await access(sourcePath);
+        } catch {
+          return toolError(`File not found or not readable: ${sourcePath}`);
+        }
       }
 
       const sniffed = await sniff(sourcePath);
@@ -52,6 +63,7 @@ export const createReadMediaHandler = (dependencies: ReadMediaDependencies = {})
           delegatedTool: delegated.delegated_tool,
           rawResult: delegated.raw_result,
           sourceHash,
+          sniffRoute: sniffed.route ?? 'magic-bytes-v1',
           ...(mislabel !== undefined ? { warnings: [mislabel] } : {}),
         });
 

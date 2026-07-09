@@ -42,6 +42,7 @@
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
+    "test:rust-sniff": "cargo test && bun test test/rustSniff.boundary.test.ts",
     "test:watch": "bun test --watch",
     "check": "biome check .",
     "check:fix": "biome check --write .",

@@ -41,6 +41,7 @@ export function buildReadMediaEnvelope(input: {
   delegatedTool: string;
   rawResult: unknown;
   sourceHash?: string;
+  sniffRoute?: string;
   warnings?: string[];
 }): AgentEvidenceEnvelope {
   const warnings = input.warnings ?? [];
@@ -57,7 +58,7 @@ export function buildReadMediaEnvelope(input: {
       detectedFormat: input.detectedFormat,
     },
     route: {
-      sniff: 'magic-bytes-v1',
+      sniff: input.sniffRoute ?? 'magic-bytes-v1',
       delegation: input.delegatedTool,
     },
     confidence: 'deterministic',

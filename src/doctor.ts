@@ -1,7 +1,13 @@
+import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { READER_DELEGATION } from './delegate/delegateToReader.js';
+import { resolveRustCliBinary } from './engine/rust-sniff.js';
 
 const require = createRequire(import.meta.url);
+const here = path.dirname(fileURLToPath(import.meta.url));
 
 export type DoctorStatus = 'ok' | 'warn' | 'fail';
 
@@ -36,6 +42,45 @@ const probeNode = (): DoctorCheck => {
   };
 };
 
+const probeRustSniffCli = (): DoctorCheck => {
+  const binary = resolveRustCliBinary();
+  if (binary !== 'smart-reader-cli' && existsSync(binary)) {
+    const probe = spawnSync(binary, [], {
+      input: JSON.stringify({
+        tool: 'resolve_media_path',
+        input: { path: path.join(here, '../package.json') },
+      }),
+      encoding: 'utf8',
+      timeout: 5_000,
+    });
+
+    if (probe.status === 0) {
+      return {
+        id: 'rust_sniff_cli',
+        status: 'ok',
+        message: `Rust sniff CLI is available at ${binary}.`,
+      };
+    }
+  }
+
+  const release = path.join(here, '../target/release/smart-reader-cli');
+  const debug = path.join(here, '../target/debug/smart-reader-cli');
+  if (existsSync(release) || existsSync(debug)) {
+    return {
+      id: 'rust_sniff_cli',
+      status: 'ok',
+      message: 'Rust sniff CLI is built locally.',
+    };
+  }
+
+  return {
+    id: 'rust_sniff_cli',
+    status: 'warn',
+    message:
+      'Rust sniff CLI is not built. Run `cargo build --release` to enable SMART_READER_USE_RUST_SNIFF=1.',
+  };
+};
+
 const probeSiblingPackage = (id: string, packageName: string): DoctorCheck => {
   try {
     require.resolve(`${packageName}/package.json`);
@@ -66,6 +111,7 @@ const aggregateStatus = (checks: DoctorCheck[]): DoctorReport['status'] => {
 export function runDoctor(version: string): DoctorReport {
   const checks = [
     probeNode(),
+    probeRustSniffCli(),
     probeSiblingPackage('reader_pdf', READER_DELEGATION.pdf.packageName),
     probeSiblingPackage('reader_image', READER_DELEGATION.image.packageName),
     probeSiblingPackage('reader_video', READER_DELEGATION.video.packageName),

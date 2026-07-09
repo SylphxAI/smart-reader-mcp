@@ -1,0 +1,15 @@
+[package]
+name = "smart-reader-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Rust media sniffing and path policy engine for smart-reader-mcp"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+tempfile = "3.20.0"
