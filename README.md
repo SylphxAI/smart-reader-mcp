@@ -68,7 +68,11 @@ returns a provenance envelope:
   "source_path": "/absolute/path/to/report.pdf",
   "detected_format": "pdf",
   "delegated_tool": "read_pdf",
-  "raw_result": {}
+  "raw_result": {
+    "page_count": 12,
+    "title": "Q3 Report",
+    "trust_report": { "warnings": [] }
+  }
 }
 ```
 
@@ -141,6 +145,23 @@ npx @sylphx/smart-reader-mcp
 
 Node.js `>=22.13` is required. Delegation resolves locally installed sibling
 packages first, then falls back to `npx -y @sylphx/<reader>-mcp`.
+
+## Security model
+
+- **Local paths only** — `read_media` resolves files on disk; no remote fetch by default.
+- **Magic-byte sniffing** — format detection uses file content, not extension alone.
+- **Sibling delegation** — spawns known Sylphx Reader packages (`@sylphx/pdf-reader-mcp`, etc.) via `npx -y`; no arbitrary executables.
+- **Provenance envelope** — `detected_format`, `delegated_tool`, and `source_path` are always returned for audit.
+
+## Release proof
+
+Claims are backed by CI `benchmark:release-gate` and the shipped-path matrix (Rust sniff/policy route).
+
+```bash
+bun run benchmark:release-gate
+```
+
+Artifact: `benchmark-artifacts/smart_reader_release_gate.json` — must report `status: passed` before release.
 
 ## Development
 
