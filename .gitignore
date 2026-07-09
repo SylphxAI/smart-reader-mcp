@@ -11,4 +11,6 @@ docs/.vitepress/dist
 
 # Test Reports
 test-report.junit.xml
+benchmark-artifacts/*.json
+test/fixtures/mislabeled/
 .vercel

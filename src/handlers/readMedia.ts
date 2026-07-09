@@ -5,6 +5,7 @@ import { buildReadMediaEnvelope, hashFile } from '../evidence/envelope.js';
 import { text, tool, toolError } from '../mcp.js';
 import { readMediaArgsSchema } from '../schemas/readMedia.js';
 import { type SniffResult, sniffFormat } from '../sniff/formatSniffer.js';
+import { mislabelWarning } from '../sniff/mislabel.js';
 
 export interface ReadMediaDependencies {
   sniffFormat?: (filePath: string) => Promise<SniffResult>;
@@ -44,12 +45,14 @@ export const createReadMediaHandler = (dependencies: ReadMediaDependencies = {})
         });
 
         const sourceHash = await hashFile(sourcePath);
+        const mislabel = mislabelWarning(sourcePath, sniffed);
         const envelope = buildReadMediaEnvelope({
           sourcePath,
           detectedFormat: sniffed.format,
           delegatedTool: delegated.delegated_tool,
           rawResult: delegated.raw_result,
           sourceHash,
+          ...(mislabel !== undefined ? { warnings: [mislabel] } : {}),
         });
 
         return text(JSON.stringify(envelope, null, 2));

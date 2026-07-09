@@ -1,0 +1,20 @@
+{
+  "subject": "/absolute/path/to/report.pdf",
+  "source": "/absolute/path/to/report.pdf",
+  "sourceHash": "sha256-example",
+  "freshness": { "indexedAt": "2026-07-09T00:00:00.000Z", "stale": false },
+  "locator": { "path": "/absolute/path/to/report.pdf", "detectedFormat": "pdf" },
+  "route": { "sniff": "magic-bytes-v1", "delegation": "read_pdf" },
+  "confidence": "deterministic",
+  "warnings": [],
+  "nextActions": [
+    "Verify delegated evidence from read_pdf",
+    "Re-run read_media after file changes to refresh sourceHash"
+  ],
+  "delegation": {
+    "source_path": "/absolute/path/to/report.pdf",
+    "detected_format": "pdf",
+    "delegated_tool": "read_pdf"
+  },
+  "result": {}
+}

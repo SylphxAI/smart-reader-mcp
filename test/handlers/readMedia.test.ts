@@ -93,6 +93,44 @@ describe('readMedia handler', () => {
     expect(textBlock.text).toContain('not available');
   });
 
+  test('includes mislabel warning when extension disagrees with sniffed format', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'smart-reader-'));
+    tempDirs.push(dir);
+    const filePath = path.join(dir, 'looks-like.pdf');
+    await writeFile(filePath, Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+
+    const handler = createReadMediaHandler({
+      delegateToReader: async () => ({
+        delegated_tool: 'read_image',
+        raw_result: { mime: 'image/png' },
+        launch: {
+          command: process.execPath,
+          args: ['/tmp/image-reader-mcp'],
+          source: 'local',
+          packageName: '@sylphx/image-reader-mcp',
+        },
+      }),
+    });
+
+    const result = await handler.handler({
+      input: { path: filePath },
+      ctx: {},
+    });
+
+    const responseText =
+      'content' in result
+        ? (result as { content: Array<{ text: string }> }).content[0]?.text
+        : (result as { text: string }).text;
+    const envelope = JSON.parse(responseText!) as {
+      warnings: string[];
+      delegation: { delegated_tool: string; detected_format: string };
+    };
+
+    expect(envelope.delegation.delegated_tool).toBe('read_image');
+    expect(envelope.delegation.detected_format).toBe('image/png');
+    expect(envelope.warnings.some((warning) => warning.includes('routing by content'))).toBe(true);
+  });
+
   test('returns error for missing files', async () => {
     const handler = createReadMediaHandler();
     const result = await handler.handler({

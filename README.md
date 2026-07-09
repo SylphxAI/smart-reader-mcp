@@ -13,7 +13,7 @@ trust — no manual format routing required.
 [![CI/CD](https://img.shields.io/github/actions/workflow/status/SylphxAI/smart-reader-mcp/ci.yml?style=flat-square&label=CI/CD)](https://github.com/SylphxAI/smart-reader-mcp/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
 
-**Local-first** · **One smart `read_media` call** · **Delegation provenance envelope** · **23 tests**
+**Local-first** · **One smart `read_media` call** · **Delegation provenance envelope** · **33 tests**
 
 [⭐ Star this repo](https://github.com/SylphxAI/smart-reader-mcp) if agents should read any media file without you wiring format switches.
 · [Quick start](#quick-start) · [See it work](#see-it-work) · [Why not manual format routing?](#why-not-manual-format-routing)
@@ -44,7 +44,7 @@ sniffs format and delegates with proof.**
 | Opaque passthrough results | Normalized envelope: `source_path`, `detected_format`, `delegated_tool`, `raw_result` |
 | Re-implemented parsers in one repo | Delegates to `@sylphx/pdf-reader-mcp`, `@sylphx/image-reader-mcp`, `@sylphx/video-reader-mcp` |
 | Cloud routing services | **Local-first** stdio delegation to sibling packages |
-| Ship and pray | **23** tests on sniffing, delegation, handler paths, and integration hooks |
+| Ship and pray | **33** tests on sniffing, mislabeled routing, doctor, release gate, and delegation |
 
 ## See it work
 
@@ -150,6 +150,8 @@ cd smart-reader-mcp
 bun install
 bun run build
 bun test
+bun run doctor
+bun run benchmark:release-gate
 ```
 
 Useful checks:
@@ -158,7 +160,10 @@ Useful checks:
 bun run check
 bun run typecheck
 bun run validate
+bun run benchmark:release-gate
 ```
+
+Example `read_media` requests live in [`examples/`](examples/).
 
 ## Support
 
