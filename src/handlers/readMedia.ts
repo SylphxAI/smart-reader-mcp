@@ -1,8 +1,9 @@
 import { access } from 'node:fs/promises';
 import path from 'node:path';
 import { delegateToReader } from '../delegate/delegateToReader.js';
+import { buildReadMediaEnvelope, hashFile } from '../evidence/envelope.js';
 import { text, tool, toolError } from '../mcp.js';
-import { type ReadMediaEnvelope, readMediaArgsSchema } from '../schemas/readMedia.js';
+import { readMediaArgsSchema } from '../schemas/readMedia.js';
 import { type SniffResult, sniffFormat } from '../sniff/formatSniffer.js';
 
 export interface ReadMediaDependencies {
@@ -42,12 +43,14 @@ export const createReadMediaHandler = (dependencies: ReadMediaDependencies = {})
           sourcePath,
         });
 
-        const envelope: ReadMediaEnvelope = {
-          source_path: sourcePath,
-          detected_format: sniffed.format,
-          delegated_tool: delegated.delegated_tool,
-          raw_result: delegated.raw_result,
-        };
+        const sourceHash = await hashFile(sourcePath);
+        const envelope = buildReadMediaEnvelope({
+          sourcePath,
+          detectedFormat: sniffed.format,
+          delegatedTool: delegated.delegated_tool,
+          rawResult: delegated.raw_result,
+          sourceHash,
+        });
 
         return text(JSON.stringify(envelope, null, 2));
       } catch (error) {

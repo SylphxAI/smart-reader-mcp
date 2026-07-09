@@ -54,17 +54,23 @@ describe('readMedia handler', () => {
         : (result as { text: string }).text;
     expect(responseText).toBeDefined();
     const envelope = JSON.parse(responseText!) as {
-      source_path: string;
-      detected_format: string;
-      delegated_tool: string;
-      raw_result: { pages: number; title: string };
+      subject: string;
+      sourceHash: string;
+      locator: { path: string; detectedFormat: string };
+      route: { sniff: string; delegation: string };
+      delegation: { delegated_tool: string; detected_format: string; source_path: string };
+      result: { pages: number; title: string };
+      nextActions: string[];
     };
 
-    expect(envelope.source_path).toBe(path.resolve(filePath));
-    expect(envelope.detected_format).toBe('pdf');
-    expect(envelope.delegated_tool).toBe('read_pdf');
-    expect(envelope.raw_result.pages).toBe(1);
-    expect(envelope.raw_result.title).toBe('mock');
+    expect(envelope.subject).toBe(path.resolve(filePath));
+    expect(envelope.locator.detectedFormat).toBe('pdf');
+    expect(envelope.delegation.delegated_tool).toBe('read_pdf');
+    expect(envelope.route.delegation).toBe('read_pdf');
+    expect(envelope.sourceHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(envelope.result.pages).toBe(1);
+    expect(envelope.result.title).toBe('mock');
+    expect(envelope.nextActions.length).toBeGreaterThan(0);
   });
 
   test('returns informative error when delegation is unavailable', async () => {

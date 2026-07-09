@@ -10,10 +10,30 @@ export const readMediaArgsSchema = z.object({
 export type ReadMediaArgs = z.infer<typeof readMediaArgsSchema>;
 
 export const readMediaEnvelopeSchema = z.object({
-  source_path: z.string(),
-  detected_format: z.string(),
-  delegated_tool: z.string(),
-  raw_result: z.unknown(),
+  subject: z.string(),
+  source: z.string(),
+  sourceHash: z.string().optional(),
+  freshness: z.object({
+    indexedAt: z.string(),
+    stale: z.boolean(),
+  }),
+  locator: z.object({
+    path: z.string(),
+    detectedFormat: z.string(),
+  }),
+  route: z.object({
+    sniff: z.string(),
+    delegation: z.string(),
+  }),
+  confidence: z.enum(['deterministic', 'derived', 'inferred', 'unknown']),
+  warnings: z.array(z.string()),
+  nextActions: z.array(z.string()),
+  delegation: z.object({
+    source_path: z.string(),
+    detected_format: z.string(),
+    delegated_tool: z.string(),
+  }),
+  result: z.unknown(),
 });
 
 export type ReadMediaEnvelope = z.infer<typeof readMediaEnvelopeSchema>;
