@@ -1,0 +1,382 @@
+{
+  "schemaVersion": 3,
+  "repo": "SylphxAI/smart-reader-mcp",
+  "repoLedgerPath": "docs/specs/migration-ledger.json",
+  "lockedAt": "2026-07-10T06:00:00Z",
+  "programSpec": {
+    "id": "rust-first-fleet-migration",
+    "controlPlaneRepo": "SylphxAI/rust-first-fleet-control-plane",
+    "programSpecPath": "PROGRAM-SPEC.json",
+    "completionStandard": "COMPLETION-STANDARD.md",
+    "parityStandard": "PARITY-VERIFICATION-STANDARD.md"
+  },
+  "adrRefs": [
+    {
+      "path": "docs/adr/ADR-PROPOSED-fleet-smart-reader-mcp-rust-north-star.md",
+      "status": "proposed",
+      "note": "North Star ADR on disk \u2014 pending ADR PR; ADR number will equal introducing PR number per Doctrine"
+    }
+  ],
+  "reauditRef": "rej-010",
+  "inventorySource": [
+    "mcp-tools",
+    "manual"
+  ],
+  "inScopeBoundary": {
+    "includeGlobs": [
+      "src/**",
+      "crates/smart-reader-core/**",
+      "crates/smart-reader-cli/**",
+      "crates/smart-reader-mcp-server/**",
+      "bin/**"
+    ],
+    "excludeGlobs": [
+      "node_modules/**",
+      "dist/**"
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "transport/web-mcp-http",
+      "domain": "transport",
+      "weight": 5,
+      "state": "rust_impl",
+      "proof": {
+        "status": "missing",
+        "dependencyGlobs": [
+          "crates/smart-reader-mcp-server/**",
+          "bin/smart-reader-mcp",
+          "scripts/differential/**",
+          "scripts/run-smart-reader-mcp-differential.sh"
+        ],
+        "staleReason": "rej-010 re-audit \u2014 prior authority_rust lacked SHA-bound differential proof",
+        "verificationRef": "scripts/run-smart-reader-mcp-differential.sh"
+      },
+      "promotionHold": {
+        "active": true,
+        "reason": "rej-010: differential harness landed \u2014 awaiting differential_green at bound SHAs",
+        "rejectionRef": "rej-010",
+        "since": "2026-07-10T21:30:00Z"
+      },
+      "rustSurface": "crates/smart-reader-mcp-server/src/http_transport.rs (rmcp StreamableHttpService)",
+      "parityTest": "test/httpTransport.matrix.test.ts; test/integration/http-transport.test.ts; test/check-no-ts-http-backend.test.ts; cargo test -p smart-reader-mcp-server",
+      "differentialTest": "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs#smart_reader_mcp_differential_matches_ts_oracle",
+      "prodProbe": "benchmark:release-gate \u2192 mcp:rust_web_http_transport; mcp:http_transport_parity; mcp:http_authority_rust",
+      "branch": "feat/rust-web-mcp-http-transport",
+      "notes": "S2: MCP_TRANSPORT=http routes exclusively to Rust rmcp; check-no-ts-http-backend gate blocks parallel TS Streamable HTTP. rej-010: SHA-bound differential harness landed (TS contract oracle vs rmcp HTTP probes). authority_rust NOT claimed until differential_green + prod smoke."
+    },
+    {
+      "id": "transport/stdio-rust-rmcp",
+      "domain": "transport",
+      "weight": 4,
+      "state": "rust_impl",
+      "proof": {
+        "status": "missing",
+        "dependencyGlobs": [
+          "crates/smart-reader-mcp-server/**",
+          "bin/smart-reader-mcp",
+          "scripts/differential/**",
+          "scripts/run-smart-reader-mcp-differential.sh"
+        ],
+        "staleReason": "rej-010 re-audit \u2014 prior parity_proven lacked SHA-bound differential proof",
+        "verificationRef": "scripts/run-smart-reader-mcp-differential.sh"
+      },
+      "promotionHold": {
+        "active": true,
+        "reason": "rej-010: differential harness landed \u2014 awaiting differential_green at bound SHAs",
+        "rejectionRef": "rej-010",
+        "since": "2026-07-10T21:30:00Z"
+      },
+      "rustSurface": "crates/smart-reader-mcp-server/src/main.rs (rmcp::transport::stdio())",
+      "parityTest": "crates/smart-reader-mcp-server/tests/read_media_golden_parity.rs; test/shippedPath.matrix.test.ts",
+      "differentialTest": "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs#smart_reader_mcp_differential_matches_ts_oracle",
+      "prodProbe": "benchmark:release-gate \u2192 mcp:rust_adapter_default; mcp:rmcp_read_media_parity",
+      "branch": "feat/rust-web-mcp-http-transport",
+      "notes": "Default npm bin launches Rust rmcp stdio server; read_media golden parity proven on rmcp handler. rej-010 cycle29: stdioProbe live probes added to differential harness. proof.status missing \u2014 NO promotion."
+    },
+    {
+      "id": "transport/stdio-ts-adapter",
+      "domain": "transport",
+      "weight": 4,
+      "state": "ts_only",
+      "rustSurface": "crates/smart-reader-mcp-server/src/main.rs (rmcp::transport::stdio())",
+      "parityTest": "scripts/check-no-ts-stdio-mcp.sh; test/check-no-ts-stdio-mcp.test.ts; test/tsAdapterDeletion.matrix.test.ts",
+      "notes": "S3 complete on disk: deleted src/index.ts + src/mcp.ts + bin TS opt-in; check-no-ts-stdio-mcp gate blocks reintroduction. ts_deleted NOT claimed \u2014 pending PR merge + prod smoke per rej-001."
+    },
+    {
+      "id": "tool/read_media",
+      "domain": "mcp-tools",
+      "weight": 5,
+      "state": "rust_impl",
+      "proof": {
+        "status": "missing",
+        "dependencyGlobs": [
+          "crates/smart-reader-core/**",
+          "src/engine/rust-read-media.ts",
+          "test/fixtures/read-media-golden.json",
+          "scripts/differential/**",
+          "scripts/run-smart-reader-mcp-differential.sh"
+        ],
+        "staleReason": "rej-010 re-audit \u2014 prior authority_rust lacked SHA-bound differential proof",
+        "verificationRef": "scripts/run-smart-reader-mcp-differential.sh"
+      },
+      "promotionHold": {
+        "active": true,
+        "reason": "rej-010: differential harness landed \u2014 awaiting differential_green at bound SHAs",
+        "rejectionRef": "rej-010",
+        "since": "2026-07-10T21:30:00Z"
+      },
+      "tsSurface": "src/handlers/readMedia.ts; src/engine/rust-read-media.ts (opt-out via SMART_READER_USE_RUST_READ_MEDIA=ts)",
+      "rustSurface": "crates/smart-reader-core/src/read_media.rs \u2192 crates/smart-reader-mcp-server/src/read_media.rs",
+      "parityTest": "test/fixtures/read-media-golden.json; crates/smart-reader-core/tests/read_media_golden_parity.rs; crates/smart-reader-mcp-server/tests/read_media_golden_parity.rs; test/readMedia.parity.test.ts; scripts/check-no-ts-read-media.sh; test/check-no-ts-read-media.test.ts",
+      "differentialTest": "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs#smart_reader_mcp_differential_matches_ts_oracle",
+      "prodProbe": "benchmark:release-gate \u2192 mcp:read_media_golden_parity; mcp:rmcp_read_media_parity; mcp:read_media_cross_parity; mcp:read_media_authority_rust",
+      "branch": "feat/rust-web-mcp-http-transport",
+      "notes": "S4: Default read_media routes through smart-reader-core via rmcp handler and rust-read-media.ts; check-no-ts-read-media gate blocks parallel TS sniff/delegation on the shipped handler path. rej-010: SHA-bound differential harness landed (TS rust-read-media oracle vs smart-reader-core + rmcp). cycle38: bounded read_media slice ledger annotation. ts_deleted not claimed."
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "ts_only": 1,
+    "contracted": 0,
+    "rust_impl": 3,
+    "parity_proven": 0,
+    "authority_rust": 0,
+    "ts_deleted": 0,
+    "proof_stale": 0,
+    "proof_missing": 3,
+    "completion_progress": 0.0,
+    "authority_progress": 0.0,
+    "verified_authority_progress": 0.0,
+    "weighted_progress": 0.675,
+    "cycle49_delta": {
+      "rust_impl_verified": 1,
+      "slice": "tool.read_media",
+      "verificationRef": "verification/smart-reader-cycle49-read-media-rust-impl.json",
+      "notes": "rej-010 rust_impl ONLY \u2014 cycle49 highest-value unimplemented slice: tool.read_media bounded differential (golden + stdio/http probes)"
+    },
+    "cycle50_delta": {
+      "rust_impl_verified": 1,
+      "slice": "transport.web-mcp-http",
+      "verificationRef": "verification/smart-reader-cycle50-http-transport-rust-impl.json",
+      "notes": "rej-010 rust_impl ONLY \u2014 cycle50 next highest-value slice: transport.web-mcp-http bounded differential (4 httpProbe cases)"
+    },
+    "cycle62_delta": {
+      "rust_impl_verified": 1,
+      "slice": "transport.stdio-rust-rmcp",
+      "verificationRef": "verification/smart-reader-cycle62-stdio-transport-rust-impl.json",
+      "notes": "rej-010 rust_impl ONLY \u2014 cycle62 next bounded slice: transport.stdio-rust-rmcp stdioProbe differential (4 cases)"
+    },
+    "cycle63_delta": {
+      "rust_impl_verified": 1,
+      "slice": "tool.read_media",
+      "verificationRef": "verification/smart-reader-cycle63-read-media-rust-impl.json",
+      "notes": "rej-010 rust_impl ONLY \u2014 cycle63 harness metadata: tool.read_media bounded differential (6 cases)"
+    },
+    "cycle64_delta": {
+      "rust_impl_verified": 1,
+      "slice": "transport.stdio-rust-rmcp",
+      "verificationRef": "verification/smart-reader-cycle64-stdio-transport-rust-impl.json",
+      "notes": "rej-010 rust_impl ONLY \u2014 cycle64 harness metadata: transport.stdio-rust-rmcp bounded differential re-verify (4 cases)"
+    }
+  },
+  "slices": {
+    "S1": {
+      "status": "shipped",
+      "evidence": [
+        "test/fixtures/read-media-golden.json",
+        "test/readMedia.parity.test.ts",
+        "crates/smart-reader-core/tests/read_media_golden_parity.rs",
+        "crates/smart-reader-mcp-server/tests/read_media_golden_parity.rs",
+        "test/integration/http-transport.test.ts"
+      ],
+      "notes": "Golden fixture parity proven across Rust core, rmcp handler, CLI, and HTTP integration harness."
+    },
+    "S2": {
+      "status": "shipped",
+      "evidence": [
+        "scripts/check-no-ts-http-backend.sh",
+        "test/check-no-ts-http-backend.test.ts",
+        "test/integration/http-transport.test.ts",
+        "crates/smart-reader-mcp-server/src/http_transport.rs",
+        "bin/smart-reader-mcp",
+        "scripts/run-smart-reader-mcp-differential.sh"
+      ],
+      "notes": "transport/web-mcp-http rust_impl on disk; HTTP bin path is Rust-only. rej-010 differential harness landed for HTTP transport contract + live probes."
+    },
+    "S3": {
+      "status": "complete_on_disk",
+      "evidence": [
+        "scripts/check-no-ts-stdio-mcp.sh",
+        "test/check-no-ts-stdio-mcp.test.ts",
+        "test/tsAdapterDeletion.matrix.test.ts",
+        "bin/smart-reader-mcp",
+        "src/toolContract.ts"
+      ],
+      "notes": "transport/stdio-ts-adapter deletion on disk: TS stdio MCP entrypoint removed; Rust rmcp is sole MCP transport. Ledger ts_deleted flip pending PR merge."
+    },
+    "S4": {
+      "status": "shipped",
+      "evidence": [
+        "src/engine/rust-read-media.ts",
+        "src/handlers/readMedia.ts",
+        "scripts/check-no-ts-read-media.sh",
+        "test/check-no-ts-read-media.test.ts",
+        "crates/smart-reader-core/tests/read_media_golden_parity.rs",
+        "crates/smart-reader-mcp-server/tests/read_media_golden_parity.rs",
+        "test/integration/http-transport.test.ts",
+        "scripts/run-smart-reader-mcp-differential.sh",
+        "scripts/differential/smart-reader-mcp-oracle.ts"
+      ],
+      "notes": "tool/read_media rust_impl on disk; default handler and rmcp route delegate to smart-reader-core. rej-010 differential harness landed for read_media golden corpus."
+    },
+    "S5": {
+      "status": "shipped",
+      "evidence": [
+        "scripts/differential/fixtures/smart-reader-mcp-corpus.json",
+        "scripts/differential/smart-reader-mcp-oracle.ts",
+        "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs",
+        "scripts/run-smart-reader-mcp-differential.sh",
+        "docs/specs/smart-reader-mcp-parity-slice.json",
+        "test/differentialHarness.matrix.test.ts"
+      ],
+      "notes": "cycle29 rej-010: transport/stdio-rust-rmcp stdioProbe differential extension. cycle38: read_media bounded slice ledger annotation. rust_impl only \u2014 proof.status missing until differential_green at bound SHAs."
+    }
+  },
+  "promotionHold": {
+    "active": true,
+    "reason": "rej-010 promotion freeze \u2014 0 capabilities with differential_green or canary_green proof",
+    "rejectionRef": "rej-010",
+    "since": "2026-07-10T21:30:00Z"
+  },
+  "cycle45": {
+    "boundedSlice": "tool.read_media|transport.web-mcp-http|transport.stdio-rust-rmcp",
+    "status": "rust_impl_on_disk_verified",
+    "reauditRef": "rej-010",
+    "evidenceRef": "/tmp/grok-goal-729a939ec6e2/implementer/cycle45-mcp-reader-batch.json",
+    "deliverables": [
+      "docs/specs/smart-reader-mcp-parity-slice.json",
+      "test/differentialHarness.matrix.test.ts",
+      "scripts/run-smart-reader-mcp-differential.sh",
+      "scripts/differential/smart-reader-mcp-oracle.ts",
+      "scripts/differential/fixtures/smart-reader-mcp-corpus.json",
+      "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs",
+      "scripts/check-no-ts-stdio-mcp.sh",
+      "scripts/check-no-ts-http-backend.sh"
+    ],
+    "harnessPath": "scripts/run-smart-reader-mcp-differential.sh",
+    "notes": "cycle45 rej-010: read_media + HTTP/stdio transport rust_impl differential harness re-verified on disk. proof.status missing until differential_green at bound SHAs \u2014 NO promotion."
+  },
+  "cycle38": {
+    "boundedSlice": "tool.read_media",
+    "status": "harness_landed_disk",
+    "evidenceRef": "/tmp/grok-goal-729a939ec6e2/implementer/cycle38-mcp/cycle38-mcp.json",
+    "deliverables": [
+      "docs/specs/smart-reader-mcp-parity-slice.json",
+      "test/differentialHarness.matrix.test.ts",
+      "scripts/run-smart-reader-mcp-differential.sh",
+      "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs",
+      "test/fixtures/read-media-golden.json"
+    ],
+    "notes": "cycle38 rej-010: read_media rust_impl differential harness + matrix gate confirmed on disk. proof.status missing until differential_green at bound SHAs."
+  },
+  "cycle39": {
+    "boundedSlice": "tool.read_media|transport.web-mcp-http|transport.stdio-rust-rmcp",
+    "status": "harness_landed_disk",
+    "evidenceRef": "/tmp/grok-goal-729a939ec6e2/implementer/cycle39-mcp-wave2.json",
+    "deliverables": [
+      "docs/specs/smart-reader-mcp-parity-slice.json",
+      "test/differentialHarness.matrix.test.ts",
+      "scripts/run-smart-reader-mcp-differential.sh",
+      "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs",
+      "scripts/check-no-ts-stdio-mcp.sh"
+    ],
+    "notes": "cycle39 rej-010: S5 differential harness + S3 stdio deletion gates re-verified on disk. rust_impl only \u2014 proof.status missing until differential_green at bound SHAs."
+  },
+  "verificationRef": "verification/smart-reader-cycle64-stdio-transport-rust-impl.json",
+  "cycle49Slice": "tool.read_media \u2014 bounded --slice entrypoint; bash scripts/run-smart-reader-mcp-differential.sh --slice tool.read_media",
+  "cycle50Slice": "transport.web-mcp-http \u2014 bounded --slice entrypoint; bash scripts/run-smart-reader-mcp-differential.sh --slice transport.web-mcp-http",
+  "cycle62Slice": "transport.stdio-rust-rmcp \u2014 bounded --slice entrypoint; bash scripts/run-smart-reader-mcp-differential.sh --slice transport.stdio-rust-rmcp; proof.status missing; authority_rust blocked per rej-010",
+  "cycle49": {
+    "boundedSlice": "tool.read_media",
+    "status": "rust_impl_on_disk_verified",
+    "reauditRef": "rej-010",
+    "verificationRef": "verification/smart-reader-cycle49-read-media-rust-impl.json",
+    "deliverables": [
+      "scripts/run-smart-reader-mcp-differential.sh",
+      "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs",
+      "scripts/differential/smart-reader-mcp-oracle.ts",
+      "scripts/differential/fixtures/smart-reader-mcp-corpus.json",
+      "docs/specs/smart-reader-mcp-parity-slice.json",
+      "test/differentialHarness.matrix.test.ts",
+      "test/fixtures/read-media-golden.json",
+      "scripts/check-no-ts-read-media.sh"
+    ],
+    "harnessPath": "scripts/run-smart-reader-mcp-differential.sh --slice tool.read_media",
+    "caseCounts": {
+      "readMediaTool": 6,
+      "stdioHttpProbes": 4
+    },
+    "notes": "cycle49 rej-010: tool.read_media bounded differential harness on-disk verify. rust_impl ONLY \u2014 proof.status missing until differential_green at bound SHAs."
+  },
+  "cycle50": {
+    "boundedSlice": "transport.web-mcp-http",
+    "status": "rust_impl_on_disk_verified",
+    "reauditRef": "rej-010",
+    "verificationRef": "verification/smart-reader-cycle50-http-transport-rust-impl.json",
+    "harnessPath": "scripts/run-smart-reader-mcp-differential.sh --slice transport.web-mcp-http",
+    "deliverables": [
+      "scripts/run-smart-reader-mcp-differential.sh",
+      "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs",
+      "scripts/differential/smart-reader-mcp-oracle.ts",
+      "scripts/differential/fixtures/smart-reader-mcp-corpus.json",
+      "docs/specs/smart-reader-mcp-parity-slice.json",
+      "test/differentialHarness.matrix.test.ts",
+      "scripts/check-no-ts-http-backend.sh"
+    ],
+    "caseCounts": {
+      "httpProbe": 4
+    },
+    "notes": "cycle50 rej-010: transport.web-mcp-http bounded differential harness on-disk verify. rust_impl ONLY \u2014 proof.status missing until differential_green at bound SHAs."
+  },
+  "cycle62": {
+    "boundedSlice": "transport.stdio-rust-rmcp",
+    "status": "rust_impl_on_disk_verified",
+    "reauditRef": "rej-010",
+    "verificationRef": "verification/smart-reader-cycle62-stdio-transport-rust-impl.json",
+    "harnessPath": "scripts/run-smart-reader-mcp-differential.sh --slice transport.stdio-rust-rmcp",
+    "deliverables": [
+      "scripts/run-smart-reader-mcp-differential.sh",
+      "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs",
+      "scripts/check-no-ts-stdio-mcp.sh"
+    ],
+    "caseCounts": {
+      "stdioProbe": 4
+    },
+    "notes": "cycle62 rej-010: transport.stdio-rust-rmcp bounded differential harness on-disk verify. rust_impl ONLY \u2014 proof.status missing until differential_green at bound SHAs."
+  },
+  "cycle63Slice": "tool.read_media \u2014 bounded --slice entrypoint; bash scripts/run-smart-reader-mcp-differential.sh --slice tool.read_media",
+  "cycle64Slice": "transport.stdio-rust-rmcp \u2014 bounded --slice entrypoint; bash scripts/run-smart-reader-mcp-differential.sh --slice transport.stdio-rust-rmcp; proof.status missing; authority_rust blocked per rej-010",
+  "cycle63": {
+    "boundedSlice": "tool.read_media",
+    "status": "rust_impl_on_disk_verified",
+    "reauditRef": "rej-010",
+    "verificationRef": "verification/smart-reader-cycle63-read-media-rust-impl.json",
+    "harnessPath": "scripts/run-smart-reader-mcp-differential.sh --slice tool.read_media",
+    "caseCounts": {
+      "readMediaTool": 6
+    },
+    "notes": "cycle63 rej-010: tool.read_media bounded differential harness on-disk verify. rust_impl ONLY \u2014 proof.status missing until differential_green at bound SHAs."
+  },
+  "cycle64": {
+    "boundedSlice": "transport.stdio-rust-rmcp",
+    "status": "rust_impl_on_disk_verified",
+    "reauditRef": "rej-010",
+    "verificationRef": "verification/smart-reader-cycle64-stdio-transport-rust-impl.json",
+    "harnessPath": "scripts/run-smart-reader-mcp-differential.sh --slice transport.stdio-rust-rmcp",
+    "caseCounts": {
+      "stdioTransport": 4
+    },
+    "notes": "cycle64 rej-010: transport.stdio-rust-rmcp bounded differential harness on-disk verify. rust_impl ONLY \u2014 proof.status missing until differential_green at bound SHAs."
+  }
+}
