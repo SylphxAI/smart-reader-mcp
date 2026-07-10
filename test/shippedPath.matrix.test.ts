@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'bun:test';
 import { execSync, spawnSync } from 'node:child_process';
-import { chmodSync, existsSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -44,6 +44,18 @@ describe('shipped path matrix (Rust core, no legacy flags)', () => {
   let nodeInvokeLog: string;
 
   beforeAll(() => {
+    // Ensure Phase 0 mislabeled fixture exists (PNG magic, .pdf extension).
+    const mislabeledDir = path.dirname(mislabeledPath);
+    mkdirSync(mislabeledDir, { recursive: true });
+    const minimalPng = Buffer.from([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+      0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53,
+      0xde, 0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41, 0x54, 0x08, 0xd7, 0x63, 0xf8, 0xcf, 0xc0, 0x00,
+      0x00, 0x03, 0x01, 0x01, 0x00, 0x18, 0xdd, 0x8d, 0xb4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e,
+      0x44, 0xae, 0x42, 0x60, 0x82,
+    ]);
+    writeFileSync(mislabeledPath, minimalPng);
+
     execSync('bun run build:rust', { cwd: repoRoot, stdio: 'pipe', timeout: 300_000 });
     if (existsSync(imageReaderCli)) {
       execSync(`cargo build --release -p image-reader-cli`, {
