@@ -215,8 +215,9 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     'mcp:rust_adapter_default',
     binWrapper.includes('smart-reader-mcp-server') &&
       binWrapper.includes('resolve_rust_bin') &&
-      binWrapper.includes('use_ts_transport'),
-    'Default npm bin launches the Rust rmcp MCP server; TypeScript adapter is opt-in only'
+      !binWrapper.includes('use_ts_transport') &&
+      !binWrapper.includes('exec node'),
+    'Default npm bin launches the Rust rmcp MCP server; TS stdio adapter is retired'
   );
 
   const httpTransportSource = readFileSync(
@@ -231,6 +232,138 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
       binWrapper.includes('resolve_transport') &&
       binWrapper.includes('MCP_TRANSPORT=http'),
     'Rust rmcp streamable HTTP Web MCP transport is wired; npm bin routes MCP_TRANSPORT=http to Rust'
+  );
+
+  const goldenParityProbe = spawnSync(
+    'cargo',
+    ['test', '-p', 'smart-reader-core', '--test', 'read_media_golden_parity'],
+    {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      timeout: 300_000,
+    }
+  );
+  addCheck(
+    checks,
+    'mcp:read_media_golden_parity',
+    fileExists('crates/smart-reader-core/tests/read_media_golden_parity.rs') &&
+      fileExists('test/fixtures/read-media-golden.json') &&
+      goldenParityProbe.status === 0,
+    'Golden parity test proves read_media envelopes match fixture contract with mocked sibling reader CLIs',
+    goldenParityProbe.status === 0
+      ? { exitCode: 0 }
+      : {
+          exitCode: goldenParityProbe.status,
+          stderr: goldenParityProbe.stderr?.slice(-2000),
+          stdout: goldenParityProbe.stdout?.slice(-2000),
+        }
+  );
+
+  const rmcpGoldenProbe = spawnSync(
+    'cargo',
+    ['test', '-p', 'smart-reader-mcp-server', '--test', 'read_media_golden_parity'],
+    {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      timeout: 300_000,
+    }
+  );
+  addCheck(
+    checks,
+    'mcp:rmcp_read_media_parity',
+    fileExists('crates/smart-reader-mcp-server/tests/read_media_golden_parity.rs') &&
+      rmcpGoldenProbe.status === 0,
+    'rmcp read_media structured content matches smart-reader-core golden envelope',
+    rmcpGoldenProbe.status === 0
+      ? { exitCode: 0 }
+      : {
+          exitCode: rmcpGoldenProbe.status,
+          stderr: rmcpGoldenProbe.stderr?.slice(-2000),
+          stdout: rmcpGoldenProbe.stdout?.slice(-2000),
+        }
+  );
+
+  const readMediaParityProbe = spawnSync('bun', ['test', 'test/readMedia.parity.test.ts'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    timeout: 300_000,
+  });
+  addCheck(
+    checks,
+    'mcp:read_media_cross_parity',
+    fileExists('test/readMedia.parity.test.ts') && readMediaParityProbe.status === 0,
+    'Cross-parity gate validates Rust CLI and TS mock handler against read-media golden fixtures',
+    readMediaParityProbe.status === 0
+      ? { exitCode: 0 }
+      : {
+          exitCode: readMediaParityProbe.status,
+          stderr: readMediaParityProbe.stderr?.slice(-2000),
+          stdout: readMediaParityProbe.stdout?.slice(-2000),
+        }
+  );
+
+  const httpParityProbe = spawnSync('bun', ['test', 'test/integration/http-transport.test.ts'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    timeout: 300_000,
+  });
+  addCheck(
+    checks,
+    'mcp:http_transport_parity',
+    fileExists('test/integration/http-transport.test.ts') && httpParityProbe.status === 0,
+    'HTTP transport integration test proves Rust rmcp streamable MCP initialize, tools/list, read_media, and auth parity',
+    httpParityProbe.status === 0
+      ? { exitCode: 0 }
+      : {
+          exitCode: httpParityProbe.status,
+          stderr: httpParityProbe.stderr?.slice(-2000),
+          stdout: httpParityProbe.stdout?.slice(-2000),
+        }
+  );
+
+  const readMediaAuthorityGate = fileExists('scripts/check-no-ts-read-media.sh');
+  const readMediaEngine = fileExists('src/engine/rust-read-media.ts')
+    ? readFileSync(path.join(repoRoot, 'src/engine/rust-read-media.ts'), 'utf8')
+    : '';
+  const readMediaHandler = fileExists('src/handlers/readMedia.ts')
+    ? readFileSync(path.join(repoRoot, 'src/handlers/readMedia.ts'), 'utf8')
+    : '';
+  addCheck(
+    checks,
+    'mcp:read_media_authority_rust',
+    readMediaAuthorityGate &&
+      readMediaEngine.includes('shouldUseRustReadMediaEngine') &&
+      readMediaEngine.includes('readMediaViaRustEngine') &&
+      readMediaHandler.includes('useRustAuthority') &&
+      readMediaHandler.includes('readMediaViaRustEngine') &&
+      fileExists('crates/smart-reader-core/src/read_media.rs') &&
+      fileExists('crates/smart-reader-mcp-server/src/read_media.rs'),
+    'read_media tool authority is Rust-only on the default shipped handler path; TS sniff/delegation requires explicit opt-in',
+    {
+      readMediaAuthorityGate,
+      rustEnginePresent: fileExists('src/engine/rust-read-media.ts'),
+      rustCorePresent: fileExists('crates/smart-reader-core/src/read_media.rs'),
+      rmcpHandlerPresent: fileExists('crates/smart-reader-mcp-server/src/read_media.rs'),
+    }
+  );
+
+  const httpAuthorityGate = fileExists('scripts/check-no-ts-http-backend.sh');
+  const stdioRetirementGate = fileExists('scripts/check-no-ts-stdio-mcp.sh');
+  addCheck(
+    checks,
+    'mcp:http_authority_rust',
+    httpAuthorityGate &&
+      stdioRetirementGate &&
+      httpTransportSource.includes('StreamableHttpService') &&
+      binWrapper.includes('MCP_TRANSPORT=http') &&
+      !fileExists('src/index.ts') &&
+      !fileExists('dist/index.js'),
+    'Web MCP HTTP transport is Rust-only authority: bin routes http to rmcp; TS stdio MCP adapter retired',
+    {
+      httpAuthorityGate,
+      stdioRetirementGate,
+      tsStdioEntryPresent: fileExists('src/index.ts') || fileExists('dist/index.js'),
+    }
   );
 
   const matrixProbe = spawnSync('bun', ['test', 'test/shippedPath.matrix.test.ts'], {

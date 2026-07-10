@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "repo": "SylphxAI/smart-reader-mcp",
+  "slice": "tool.read_media|transport.web-mcp-http|transport.stdio-rust-rmcp",
+  "differentialHarness": "scripts/run-smart-reader-mcp-differential.sh",
+  "oracle": "scripts/differential/smart-reader-mcp-oracle.ts",
+  "behaviorSpec": "scripts/differential/fixtures/smart-reader-mcp-corpus.json",
+  "differentialTest": "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs#smart_reader_mcp_differential_matches_ts_oracle",
+  "domains": [
+    {
+      "id": "tool/read_media",
+      "differentialTest": true,
+      "fixture": "test/fixtures/read-media-golden.json"
+    },
+    {
+      "id": "transport/web-mcp-http",
+      "differentialTest": true,
+      "contract": "transportContract|surfaceContract.http|httpProbe"
+    },
+    {
+      "id": "transport/stdio-rust-rmcp",
+      "differentialTest": true,
+      "contract": "transportContract|surfaceContract.stdio|serverContract|stdioProbe"
+    }
+  ],
+  "notes": "rej-010 differential slice manifest. Does not promote fleet ledger state."
+}

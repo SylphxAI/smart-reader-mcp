@@ -1,0 +1,112 @@
+{
+  "corpusVersion": 1,
+  "transportContractCases": [
+    {
+      "id": "transport-default-stdio",
+      "env": {},
+      "expect": { "transport": "stdio" }
+    },
+    {
+      "id": "transport-mcp-http",
+      "env": { "MCP_TRANSPORT": "http" },
+      "expect": { "transport": "http" }
+    },
+    {
+      "id": "transport-smart-reader-http",
+      "env": { "SMART_READER_MCP_TRANSPORT": "http" },
+      "expect": { "transport": "http" }
+    },
+    {
+      "id": "transport-smart-reader-precedence",
+      "env": {
+        "SMART_READER_MCP_TRANSPORT": "stdio",
+        "MCP_TRANSPORT": "http"
+      },
+      "expect": { "transport": "stdio" }
+    }
+  ],
+  "surfaceContractCases": [
+    {
+      "id": "surface-bin-rmcp",
+      "surface": "bin",
+      "markers": ["resolve_rust_bin", "resolve_transport", "MCP_TRANSPORT=http"]
+    },
+    {
+      "id": "surface-stdio-rmcp",
+      "surface": "stdio",
+      "markers": ["transport::stdio", "http_transport::transport_from_env"]
+    },
+    {
+      "id": "surface-http-rmcp",
+      "surface": "http",
+      "markers": ["StreamableHttpService", "health_check", "serve_http"]
+    }
+  ],
+  "readMediaCases": [
+    { "id": "tool-pdf", "goldenId": "pdf" },
+    { "id": "tool-image", "goldenId": "image" },
+    { "id": "tool-video", "goldenId": "video" },
+    { "id": "tool-mislabeled-png-as-pdf", "goldenId": "mislabeled-png-as-pdf" },
+    { "id": "tool-unsupported", "goldenId": "unsupported" }
+  ],
+  "stdioProbeCases": [
+    {
+      "id": "stdio-initialize",
+      "kind": "initialize",
+      "expect": { "serverName": "smart-reader-mcp" }
+    },
+    {
+      "id": "stdio-tools-list",
+      "kind": "toolsList",
+      "expect": { "tools": ["read_media"] }
+    },
+    {
+      "id": "stdio-read-media-mislabeled",
+      "kind": "readMedia",
+      "goldenId": "mislabeled-png-as-pdf"
+    },
+    {
+      "id": "stdio-read-media-pdf",
+      "kind": "readMedia",
+      "goldenId": "pdf"
+    },
+    {
+      "id": "stdio-read-media-unsupported",
+      "kind": "readMedia",
+      "goldenId": "unsupported"
+    }
+  ],
+  "httpProbeCases": [
+    {
+      "id": "http-health",
+      "kind": "health",
+      "path": "/mcp/health",
+      "expect": { "status": "ok" }
+    },
+    {
+      "id": "http-initialize",
+      "kind": "initialize",
+      "expect": { "serverName": "smart-reader-mcp" }
+    },
+    {
+      "id": "http-tools-list",
+      "kind": "toolsList",
+      "expect": { "tools": ["read_media"] }
+    },
+    {
+      "id": "http-read-media-mislabeled",
+      "kind": "readMedia",
+      "fixture": "mislabeled/png-as-pdf.pdf",
+      "expect": {
+        "route": "rust-read-media-v1",
+        "delegatedTool": "read_image",
+        "detectedFormat": "image/png",
+        "selectedCategory": "image"
+      }
+    }
+  ],
+  "serverContract": {
+    "name": "smart-reader-mcp",
+    "tools": ["read_media"]
+  }
+}

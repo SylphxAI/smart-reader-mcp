@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "repo": "SylphxAI/smart-reader-mcp",
+  "cycle": "cycle49",
+  "reauditRef": "rej-010",
+  "verifiedAt": "2026-07-10T30:00:00Z",
+  "status": "rust_impl_on_disk_verified",
+  "executionStatus": "harness_present_shell_unavailable",
+  "promotionPolicy": "NO_PROMOTIONS — rust_impl ONLY per rej-010; proof.status remains missing until differential_green at bound SHAs",
+  "slice": "tool.read_media",
+  "capabilities": ["tool/read_media"],
+  "rustSurfaces": [
+    "crates/smart-reader-core/src/read_media.rs",
+    "crates/smart-reader-mcp-server/src/read_media.rs",
+    "src/engine/rust-read-media.ts"
+  ],
+  "harness": {
+    "entrypoint": "scripts/run-smart-reader-mcp-differential.sh --slice tool.read_media",
+    "differentialTest": "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs#smart_reader_mcp_differential_matches_ts_oracle",
+    "oracle": "scripts/differential/smart-reader-mcp-oracle.ts",
+    "corpus": "scripts/differential/fixtures/smart-reader-mcp-corpus.json",
+    "paritySlice": "docs/specs/smart-reader-mcp-parity-slice.json",
+    "matrixTest": "test/differentialHarness.matrix.test.ts"
+  },
+  "caseCounts": {
+    "readMediaTool": 6,
+    "stdioHttpProbes": 4
+  },
+  "resumeCommands": [
+    "bun test test/differentialHarness.matrix.test.ts",
+    "bash scripts/run-smart-reader-mcp-differential.sh --slice tool.read_media",
+    "bash scripts/run-smart-reader-mcp-differential.sh"
+  ],
+  "notes": "Cycle49 rej-010: tool.read_media bounded differential harness on-disk verify. Shell unavailable (rej-007)."
+}

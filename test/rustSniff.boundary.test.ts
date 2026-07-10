@@ -91,6 +91,8 @@ describe('rust sniff engine boundary', () => {
     const engineSrc = readFileSync(path.join(repoRoot, 'src/engine/rust-sniff.ts'), 'utf8');
 
     expect(engineSrc).toContain('spawnSync');
+    expect(handlerSrc).toContain('readMediaViaRustEngine');
+    expect(handlerSrc).toContain('shouldUseRustReadMediaEngine');
     expect(handlerSrc).toContain('resolveMediaPathViaRustEngine');
     expect(handlerSrc).not.toMatch(/0x89,\s*0x50,\s*0x4e,\s*0x47/);
     expect(snifferSrc).toContain('sniffFormatViaRustEngine');

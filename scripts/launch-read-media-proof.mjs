@@ -20,14 +20,14 @@ const resolveBin = (packageName, binName) => {
   return path.resolve(path.dirname(packageJsonPath), binRelative);
 };
 
-const smartEntry = path.resolve(repoRoot, 'dist/index.js');
+const smartEntry = path.resolve(repoRoot, 'bin/smart-reader-mcp');
 const pdfFixture = path.resolve(repoRoot, '../pdf-reader-mcp/test/fixtures/sample.pdf');
 const imageFixture = path.resolve(repoRoot, '../image-reader-mcp/test/fixtures/sample.png');
 
 const callReadMedia = async (sourcePath) => {
   const transport = new StdioClientTransport({
-    command: process.execPath,
-    args: [smartEntry],
+    command: smartEntry,
+    args: [],
     stderr: 'pipe',
   });
   const client = new Client({ name: 'read-media-proof', version: '0.1.0' });

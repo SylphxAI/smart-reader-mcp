@@ -22,6 +22,9 @@ jobs:
       - run: bun run typecheck
       - run: bun run build
       - run: bun test
+      - run: bun run check:no-ts-http-backend
+      - run: bun run check:no-ts-stdio-mcp
+      - run: bun run check:no-ts-read-media
       - run: bun run test:rust-sniff
       - run: bun test test/readmeDiscovery.test.ts
       - run: bun run benchmark:release-gate

@@ -5,9 +5,13 @@ import {
   buildRoutingDiagnostics,
   DELEGATION_CONTRACT_VERSION,
 } from '../delegate/delegationContract.js';
+import {
+  readMediaViaRustEngine,
+  shouldUseRustReadMediaEngine,
+} from '../engine/rust-read-media.js';
 import { resolveMediaPathViaRustEngine, shouldUseRustSniffEngine } from '../engine/rust-sniff.js';
 import { buildReadMediaEnvelope, hashFile } from '../evidence/envelope.js';
-import { text, tool, toolError } from '../mcp.js';
+import { text, tool, toolError } from '../toolContract.js';
 import { readMediaArgsSchema } from '../schemas/readMedia.js';
 import { type SniffResult, sniffFormat } from '../sniff/formatSniffer.js';
 import { mislabelWarning } from '../sniff/mislabel.js';
@@ -20,6 +24,8 @@ export interface ReadMediaDependencies {
 export const createReadMediaHandler = (dependencies: ReadMediaDependencies = {}) => {
   const sniff = dependencies.sniffFormat ?? sniffFormat;
   const delegate = dependencies.delegateToReader ?? delegateToReader;
+  const useRustAuthority =
+    shouldUseRustReadMediaEngine() && !dependencies.sniffFormat && !dependencies.delegateToReader;
 
   return tool()
     .description(
@@ -27,6 +33,14 @@ export const createReadMediaHandler = (dependencies: ReadMediaDependencies = {})
     )
     .input(readMediaArgsSchema)
     .handler(async ({ input }) => {
+      if (useRustAuthority) {
+        const rustResult = readMediaViaRustEngine({ path: input.path });
+        if (rustResult.ok) {
+          return text(rustResult.text);
+        }
+        return toolError(rustResult.message);
+      }
+
       let sourcePath: string;
       try {
         sourcePath = shouldUseRustSniffEngine()
