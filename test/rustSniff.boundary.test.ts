@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { execSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createReadMediaHandler } from '../src/handlers/readMedia.js';
 import { sniffFormat } from '../src/sniff/formatSniffer.js';
@@ -10,6 +10,18 @@ const mislabeledPath = path.join(import.meta.dirname, 'fixtures', 'mislabeled', 
 
 describe('rust sniff engine boundary', () => {
   beforeAll(() => {
+    const mislabeledDir = path.dirname(mislabeledPath);
+    mkdirSync(mislabeledDir, { recursive: true });
+    writeFileSync(
+      mislabeledPath,
+      Buffer.from([
+        0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44,
+        0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02, 0x00, 0x00, 0x00, 0x90,
+        0x77, 0x53, 0xde, 0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41, 0x54, 0x08, 0xd7, 0x63, 0xf8,
+        0xcf, 0xc0, 0x00, 0x00, 0x03, 0x01, 0x01, 0x00, 0x18, 0xdd, 0x8d, 0xb4, 0x00, 0x00, 0x00,
+        0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+      ])
+    );
     execSync('cargo build -q', { cwd: repoRoot, stdio: 'pipe', timeout: 120_000 });
     delete process.env.SMART_READER_USE_RUST_SNIFF;
   }, 120_000);
