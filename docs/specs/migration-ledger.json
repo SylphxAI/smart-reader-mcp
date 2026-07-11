@@ -49,8 +49,10 @@
           "scripts/differential/**",
           "scripts/run-smart-reader-mcp-differential.sh"
         ],
-        "staleReason": "rej-010 re-audit \u2014 prior authority_rust lacked SHA-bound differential proof",
-        "verificationRef": "scripts/run-smart-reader-mcp-differential.sh"
+        "staleReason": "FINISH-LINE-NEAR-COMPLETE-TICK030: harness allow-list is read_media only; HTTP/stdio transport dual-path differential not claimed at tip fbdb1f5d125d. proof.missing retained (honest).",
+        "verificationRef": "scripts/run-smart-reader-mcp-differential.sh",
+        "rustCandidateSha": "fbdb1f5d125dc4f7657edc3280fd5facc5a3dc15",
+        "verifiedAt": "2026-07-11T19:05:16Z"
       },
       "promotionHold": {
         "active": true,
@@ -78,8 +80,10 @@
           "scripts/differential/**",
           "scripts/run-smart-reader-mcp-differential.sh"
         ],
-        "staleReason": "rej-010 re-audit \u2014 prior parity_proven lacked SHA-bound differential proof",
-        "verificationRef": "scripts/run-smart-reader-mcp-differential.sh"
+        "staleReason": "FINISH-LINE-NEAR-COMPLETE-TICK030: harness allow-list is read_media only; HTTP/stdio transport dual-path differential not claimed at tip fbdb1f5d125d. proof.missing retained (honest).",
+        "verificationRef": "scripts/run-smart-reader-mcp-differential.sh",
+        "rustCandidateSha": "fbdb1f5d125dc4f7657edc3280fd5facc5a3dc15",
+        "verifiedAt": "2026-07-11T19:05:16Z"
       },
       "promotionHold": {
         "active": true,
@@ -109,22 +113,27 @@
       "weight": 5,
       "state": "rust_impl",
       "proof": {
-        "status": "missing",
+        "status": "differential_green",
+        "baselineTsSha": "3eae4ba4c231ba5d1df0f61a9395f9f96059a22d",
+        "rustCandidateSha": "fbdb1f5d125dc4f7657edc3280fd5facc5a3dc15",
+        "lastComparedMainSha": "fbdb1f5d125dc4f7657edc3280fd5facc5a3dc15",
+        "mergeGroupSha": "fbdb1f5d125dc4f7657edc3280fd5facc5a3dc15",
+        "behaviorSpecHash": "f3c39c45d70b6c6698ca455f4cea3a671148f88e511f466209db58aacd92d410",
+        "fixtureCorpusHash": "f3c39c45d70b6c6698ca455f4cea3a671148f88e511f466209db58aacd92d410",
+        "verifiedAt": "2026-07-11T19:05:16Z",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-NEAR-COMPLETE-TICK030/verification/smart-reader-mcp-tip-differential.json",
         "dependencyGlobs": [
-          "crates/smart-reader-core/**",
-          "src/engine/rust-read-media.ts",
-          "test/fixtures/read-media-golden.json",
+          "crates/smart-reader-mcp-server/**",
           "scripts/differential/**",
           "scripts/run-smart-reader-mcp-differential.sh"
         ],
-        "staleReason": "rej-010 re-audit \u2014 prior authority_rust lacked SHA-bound differential proof",
-        "verificationRef": "scripts/run-smart-reader-mcp-differential.sh"
+        "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: read_media differential_green at tip fbdb1f5d125d (6 cases). HTTP transport NOT claimed. state remains rust_impl under freeze."
       },
       "promotionHold": {
         "active": true,
-        "reason": "rej-010: differential harness landed \u2014 awaiting differential_green at bound SHAs",
+        "reason": "rej-010/013: differential_green recorded \u2014 promotion_hold until prod canary + freeze allows",
         "rejectionRef": "rej-010",
-        "since": "2026-07-10T21:30:00Z"
+        "since": "2026-07-11T20:00:00Z"
       },
       "tsSurface": "src/handlers/readMedia.ts; src/engine/rust-read-media.ts (opt-out via SMART_READER_USE_RUST_READ_MEDIA=ts)",
       "rustSurface": "crates/smart-reader-core/src/read_media.rs \u2192 crates/smart-reader-mcp-server/src/read_media.rs",
@@ -144,7 +153,7 @@
     "authority_rust": 0,
     "ts_deleted": 0,
     "proof_stale": 0,
-    "proof_missing": 3,
+    "proof_missing": 2,
     "completion_progress": 0.0,
     "authority_progress": 0.0,
     "verified_authority_progress": 0.0,
@@ -178,6 +187,18 @@
       "slice": "transport.stdio-rust-rmcp",
       "verificationRef": "verification/smart-reader-cycle64-stdio-transport-rust-impl.json",
       "notes": "rej-010 rust_impl ONLY \u2014 cycle64 harness metadata: transport.stdio-rust-rmcp bounded differential re-verify (4 cases)"
+    },
+    "notes": "FINISH-LINE-NEAR-COMPLETE-TICK030: tool/read_media\u2192differential_green @ fbdb1f5d125d; transports remain proof.missing (allow-list honesty). NO promotions. completion_progress=0.",
+    "liveMainTip": "fbdb1f5d125dc4f7657edc3280fd5facc5a3dc15",
+    "lastMutation": "FINISH-LINE-NEAR-COMPLETE-TICK030",
+    "updatedAt": "2026-07-11T19:05:16Z",
+    "tick030_delta": {
+      "packetId": "FINISH-LINE-NEAR-COMPLETE-TICK030",
+      "read_media": "differential_green",
+      "transports": "proof.missing retained",
+      "tip": "fbdb1f5d125dc4f7657edc3280fd5facc5a3dc15",
+      "cases": 6,
+      "promotions": false
     }
   },
   "slices": {
