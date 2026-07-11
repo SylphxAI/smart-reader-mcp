@@ -10,6 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   release:
@@ -40,6 +41,17 @@ jobs:
 
       - name: Run tests
         run: bun test
+
+      - name: Verify Rust-default consumer bin is staged
+        run: |
+          set -euo pipefail
+          test -x bin/smart-reader-mcp
+          test -x bin/native/smart-reader-mcp-server
+          file bin/native/smart-reader-mcp-server
+          # Fail closed if the staged native is empty/tiny
+          test "$(wc -c < bin/native/smart-reader-mcp-server)" -gt 100000
+          # Consumer package must ship the launcher, not dist/index.js as bin
+          node -e "const p=require('./package.json'); if(p.bin['smart-reader-mcp']!=='./bin/smart-reader-mcp'){console.error(p.bin); process.exit(1)}"
 
       - name: Create release PR or publish
         uses: changesets/action@v1

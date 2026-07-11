@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+
+### Minor Changes
+
+- Publish the Rust-default MCP consumer package: npm bin is `bin/smart-reader-mcp` (rmcp launcher, fail-closed without native) with staged `bin/native/smart-reader-mcp-server` (linux x86_64). Binds consumer artifact to main after pure-TS 0.1.1.
+
 ## 0.1.1
 
 ### Patch Changes

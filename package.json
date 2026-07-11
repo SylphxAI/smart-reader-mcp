@@ -1,6 +1,6 @@
 {
   "name": "@sylphx/smart-reader-mcp",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "mcpName": "io.github.SylphxAI/smart-reader-mcp",
   "description": "One MCP call reads PDF, image, or video by sniffing format and delegating to Sylphx Reader siblings.",
   "type": "module",
