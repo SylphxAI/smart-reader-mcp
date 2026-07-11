@@ -1,0 +1,21 @@
+{
+  "name": "@sylphx/smart-reader-mcp-darwin-arm64",
+  "version": "0.2.1",
+  "description": "Smart Reader MCP server native binary for darwin-arm64",
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "files": ["smart-reader-mcp-server"],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SylphxAI/smart-reader-mcp.git",
+    "directory": "npm/darwin-arm64"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}

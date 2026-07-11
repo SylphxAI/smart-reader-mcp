@@ -1,0 +1,21 @@
+{
+  "name": "@sylphx/smart-reader-mcp-linux-x64-gnu",
+  "version": "0.2.1",
+  "description": "Smart Reader MCP server native binary for linux-x64-gnu",
+  "os": ["linux"],
+  "cpu": ["x64"],
+  "files": ["smart-reader-mcp-server"],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SylphxAI/smart-reader-mcp.git",
+    "directory": "npm/linux-x64-gnu"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}

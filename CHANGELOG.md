@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+### Patch Changes
+
+- Publish multi-arch optionalDependencies for the Rust MCP server (`darwin-arm64`, `darwin-x64`, `linux-x64-gnu`, `linux-arm64-gnu`). Arch-aware `bin/smart-reader-mcp` resolves the platform package (or host-matched staged native) and rejects wrong-arch ELF so Darwin consumers no longer fail with "cannot execute binary file".
+
 ## 0.2.0
 
 ### Minor Changes
