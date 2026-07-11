@@ -1,12 +1,137 @@
 #!/usr/bin/env bash
+# Smart Reader MCP launcher — Rust rmcp default (fail-closed).
+# Resolves platform-matched native via optionalDependencies, staged bin/native, or local cargo target.
+# Residual TS adapter: SMART_READER_MCP_TRANSPORT=ts or argv ts only (explicit opt-in).
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# Resolve this script's directory even when npm installs a .bin symlink.
+resolve_bin_dir() {
+	local source="${BASH_SOURCE[0]}"
+	local dir
+	while [[ -L "$source" ]]; do
+		dir="$(cd -P "$(dirname "$source")" && pwd)"
+		source="$(readlink "$source")"
+		[[ "$source" != /* ]] && source="$dir/$source"
+	done
+	cd -P "$(dirname "$source")" && pwd
+}
+
+ROOT="$(cd "$(resolve_bin_dir)/.." && pwd)"
 TS_ENTRY="$ROOT/dist/index.js"
 
+host_platform_key() {
+	local os arch
+	os="$(uname -s 2>/dev/null || echo unknown)"
+	arch="$(uname -m 2>/dev/null || echo unknown)"
+	case "$os" in
+		Darwin) os="darwin" ;;
+		Linux) os="linux" ;;
+		MINGW*|MSYS*|CYGWIN*|Windows_NT) os="win32" ;;
+		*) os="$(printf '%s' "$os" | tr '[:upper:]' '[:lower:]')" ;;
+	esac
+	case "$arch" in
+		x86_64|amd64) arch="x64" ;;
+		aarch64|arm64) arch="arm64" ;;
+		armv7l) arch="arm" ;;
+		i386|i686) arch="ia32" ;;
+	esac
+	printf '%s-%s\n' "$os" "$arch"
+}
+
+platform_package_name() {
+	case "$(host_platform_key)" in
+		darwin-arm64) printf '%s\n' '@sylphx/smart-reader-mcp-darwin-arm64' ;;
+		darwin-x64) printf '%s\n' '@sylphx/smart-reader-mcp-darwin-x64' ;;
+		linux-x64) printf '%s\n' '@sylphx/smart-reader-mcp-linux-x64-gnu' ;;
+		linux-arm64) printf '%s\n' '@sylphx/smart-reader-mcp-linux-arm64-gnu' ;;
+		*) return 1 ;;
+	esac
+}
+
+# Prefer a path only when it is executable *and* matches this host's binary format
+# (avoids treating a wrong-arch ELF as "present" then hard-failing at exec).
+is_runnable_native() {
+	local candidate="$1"
+	[[ -n "$candidate" && -f "$candidate" && -x "$candidate" ]] || return 1
+
+	if command -v file >/dev/null 2>&1; then
+		local info
+		info="$(file -b "$candidate" 2>/dev/null || true)"
+		case "$(host_platform_key)" in
+			darwin-arm64)
+				[[ "$info" == *"Mach-O"* && ( "$info" == *"arm64"* || "$info" == *"aarch64"* ) ]] || return 1
+				;;
+			darwin-x64)
+				[[ "$info" == *"Mach-O"* && ( "$info" == *"x86_64"* || "$info" == *"x86-64"* ) ]] || return 1
+				;;
+			linux-x64)
+				[[ "$info" == *"ELF"* && ( "$info" == *"x86-64"* || "$info" == *"x86_64"* ) ]] || return 1
+				;;
+			linux-arm64)
+				[[ "$info" == *"ELF"* && ( "$info" == *"aarch64"* || "$info" == *"ARM aarch64"* || "$info" == *"arm64"* ) ]] || return 1
+				;;
+		esac
+	fi
+	return 0
+}
+
+resolve_from_optional_dep() {
+	local pkg_name pkg_dir candidate
+	pkg_name="$(platform_package_name 2>/dev/null || true)"
+	[[ -n "$pkg_name" ]] || return 1
+
+	local search_roots=(
+		"$ROOT/node_modules"
+		"$ROOT/../node_modules"
+		"$ROOT/../../node_modules"
+		"$ROOT/../../../node_modules"
+	)
+
+	for root in "${search_roots[@]}"; do
+		pkg_dir="$root/$pkg_name"
+		candidate="$pkg_dir/smart-reader-mcp-server"
+		if is_runnable_native "$candidate"; then
+			printf '%s\n' "$candidate"
+			return 0
+		fi
+	done
+
+	if command -v node >/dev/null 2>&1; then
+		candidate="$(
+			node -e "
+        try {
+          const p = require('node:path');
+          const { createRequire } = require('node:module');
+          const r = createRequire(p.join('$ROOT', 'package.json'));
+          const pkg = r.resolve('$pkg_name/package.json');
+          process.stdout.write(p.join(p.dirname(pkg), 'smart-reader-mcp-server'));
+        } catch {
+          process.exit(1);
+        }
+      " 2>/dev/null || true
+		)"
+		if is_runnable_native "${candidate:-}"; then
+			printf '%s\n' "$candidate"
+			return 0
+		fi
+	fi
+
+	return 1
+}
+
 resolve_rust_bin() {
-	if [[ -n "${SMART_READER_MCP_RUST_BIN:-}" && -x "${SMART_READER_MCP_RUST_BIN}" ]]; then
-		printf '%s\n' "${SMART_READER_MCP_RUST_BIN}"
+	if [[ -n "${SMART_READER_MCP_RUST_BIN:-}" ]]; then
+		if is_runnable_native "${SMART_READER_MCP_RUST_BIN}"; then
+			printf '%s\n' "${SMART_READER_MCP_RUST_BIN}"
+			return 0
+		fi
+		echo "[smart-reader-mcp] SMART_READER_MCP_RUST_BIN is set but not a runnable native for $(host_platform_key): ${SMART_READER_MCP_RUST_BIN}" >&2
+		return 1
+	fi
+
+	local candidate
+	if candidate="$(resolve_from_optional_dep)"; then
+		printf '%s\n' "$candidate"
 		return 0
 	fi
 
@@ -14,7 +139,7 @@ resolve_rust_bin() {
 		"$ROOT/bin/native/smart-reader-mcp-server" \
 		"$ROOT/target/release/smart-reader-mcp-server" \
 		"$ROOT/target/debug/smart-reader-mcp-server"; do
-		if [[ -x "$candidate" ]]; then
+		if is_runnable_native "$candidate"; then
 			printf '%s\n' "$candidate"
 			return 0
 		fi
@@ -31,6 +156,10 @@ if use_ts_transport "$@"; then
 	if [[ "${1:-}" == "ts" ]]; then
 		shift
 	fi
+	if [[ ! -f "$TS_ENTRY" ]]; then
+		echo "[smart-reader-mcp] TS adapter missing at dist/index.js — run: bun run build" >&2
+		exit 1
+	fi
 	exec node "$TS_ENTRY" "$@"
 fi
 
@@ -38,5 +167,15 @@ if bin="$(resolve_rust_bin)"; then
 	exec "$bin" "$@"
 fi
 
-echo "[smart-reader-mcp] Rust MCP server (rmcp) is not built. Run: bun run build:rust" >&2
+host="$(host_platform_key)"
+pkg="$(platform_package_name 2>/dev/null || true)"
+echo "[smart-reader-mcp] No runnable Rust MCP server (rmcp) for host platform: ${host}" >&2
+if [[ -n "${pkg:-}" ]]; then
+	echo "[smart-reader-mcp] Expected optionalDependency package: ${pkg} (smart-reader-mcp-server binary)." >&2
+	echo "[smart-reader-mcp] Reinstall with optional deps enabled, or run: bun run build:rust" >&2
+else
+	echo "[smart-reader-mcp] Unsupported platform for published natives. Supported: darwin-arm64, darwin-x64, linux-x64, linux-arm64." >&2
+	echo "[smart-reader-mcp] Build from source: bun run build:rust" >&2
+fi
+echo "[smart-reader-mcp] Residual TS adapter: SMART_READER_MCP_TRANSPORT=ts (opt-in only)." >&2
 exit 1

@@ -20,6 +20,10 @@
       "optionalDependencies": {
         "@sylphx/image-reader-mcp": "0.1.0",
         "@sylphx/pdf-reader-mcp": "3.0.14",
+        "@sylphx/smart-reader-mcp-darwin-arm64": "0.2.1",
+        "@sylphx/smart-reader-mcp-darwin-x64": "0.2.1",
+        "@sylphx/smart-reader-mcp-linux-arm64-gnu": "0.2.1",
+        "@sylphx/smart-reader-mcp-linux-x64-gnu": "0.2.1",
         "@sylphx/video-reader-mcp": "0.1.0",
       },
     },

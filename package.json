@@ -1,6 +1,6 @@
 {
   "name": "@sylphx/smart-reader-mcp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "mcpName": "io.github.SylphxAI/smart-reader-mcp",
   "description": "One MCP call reads PDF, image, or video by sniffing format and delegating to Sylphx Reader siblings.",
   "type": "module",
@@ -50,13 +50,16 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "sync:server-json": "bun scripts/sync-server-json.ts",
-    "version-packages": "changeset version && bun run sync:server-json",
+    "sync:platform-versions": "bun scripts/sync-platform-versions.ts",
+    "assemble:multiarch": "bun scripts/assemble-multiarch-natives.ts",
+    "verify:multiarch-readback": "bun scripts/verify-multiarch-readback.ts",
+    "version-packages": "changeset version && bun run sync:server-json && bun run sync:platform-versions",
     "validate": "bun run check && bun run typecheck && bun run build && bun run test",
     "doctor": "bun run src/index.ts doctor",
     "benchmark:release-gate": "bun scripts/release-gate.ts",
     "clean": "rm -rf dist coverage",
     "prepublishOnly": "bun run clean && bun run build",
-    "release": "bun run typecheck && bun run check && bun run build && bun test && changeset publish"
+    "release": "bun scripts/sync-platform-versions.ts && bun scripts/publish-platform-packages.ts && bun run typecheck && bun run check && bun run build && bun test && changeset publish"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -66,7 +69,11 @@
   "optionalDependencies": {
     "@sylphx/pdf-reader-mcp": "3.0.14",
     "@sylphx/image-reader-mcp": "0.1.0",
-    "@sylphx/video-reader-mcp": "0.1.0"
+    "@sylphx/video-reader-mcp": "0.1.0",
+    "@sylphx/smart-reader-mcp-darwin-arm64": "0.2.1",
+    "@sylphx/smart-reader-mcp-darwin-x64": "0.2.1",
+    "@sylphx/smart-reader-mcp-linux-x64-gnu": "0.2.1",
+    "@sylphx/smart-reader-mcp-linux-arm64-gnu": "0.2.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",

@@ -15,3 +15,11 @@ test-report.junit.xml
 benchmark-artifacts/*.json
 test/fixtures/mislabeled/
 .vercel
+
+# Staged host native (built via bun run build:rust or release assemble)
+bin/native/*
+!bin/native/.gitkeep
+
+# Multi-arch assembled native binaries (built in CI)
+npm/*/smart-reader-mcp-server
+artifacts/
