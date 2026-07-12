@@ -115,19 +115,19 @@
       "proof": {
         "status": "differential_green",
         "baselineTsSha": "3eae4ba4c231ba5d1df0f61a9395f9f96059a22d",
-        "rustCandidateSha": "1a25cfb19845330fe91b79227a4398197cf3366f",
-        "lastComparedMainSha": "1a25cfb19845330fe91b79227a4398197cf3366f",
-        "mergeGroupSha": "1a25cfb19845330fe91b79227a4398197cf3366f",
+        "rustCandidateSha": "76ca38abedff6a70193e700525a791ba9d7ac6fc",
+        "lastComparedMainSha": "76ca38abedff6a70193e700525a791ba9d7ac6fc",
+        "mergeGroupSha": "76ca38abedff6a70193e700525a791ba9d7ac6fc",
         "behaviorSpecHash": "f3c39c45d70b6c6698ca455f4cea3a671148f88e511f466209db58aacd92d410",
         "fixtureCorpusHash": "f3c39c45d70b6c6698ca455f4cea3a671148f88e511f466209db58aacd92d410",
-        "verifiedAt": "2026-07-11T21:17:39Z",
-        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PAIR-TICK032/verification/smart-reader-mcp-tip-differential.json",
+        "verifiedAt": "2026-07-12T01:04:33+01:00",
+        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PASS-TICK035/verification/smart-reader-mcp-tip-differential.json",
         "dependencyGlobs": [
           "crates/smart-reader-mcp-server/**",
           "scripts/differential/**",
           "scripts/run-smart-reader-mcp-differential.sh"
         ],
-        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind read_media differential_green at 1a25cfb19845 (6 cases). proofInputDigest adopted. HTTP/stdio transport NOT claimed. state remains rust_impl under freeze (rej-010/011/013).",
+        "notes": "FINISH-LINE-MCP-PAIR-TICK032: tip-bind read_media differential_green at 1a25cfb19845 (6 cases). proofInputDigest adopted. HTTP/stdio transport NOT claimed. state remains rust_impl under freeze (rej-010/011/013). | FINISH-LINE-MCP-PASS-TICK035: tip-rebind at live main; differential reconfirm green; lastCompared/mergeGroup/rustCandidate watermarked; NO new ts_deleted/authority (rej-010/011/013).",
         "proofInputDigest": "c3a50f1965dac51f0c37491fc2639dda52db72f2065dc69a1b462372f479817e",
         "proofInputDigestFields": {
           "tsClosure": "dd99955573a0ddc1cbf16ee9a868395f98f3d06d87be15433d30e37ba9572ba3",
@@ -140,7 +140,7 @@
           "deploySpecs": "660b257878a4f000ef36a91de885557000331fa1ebe6db55fb6ca6e23444813a"
         },
         "proofInputDigestVersion": 1,
-        "proofInputDigestBoundSha": "1a25cfb19845330fe91b79227a4398197cf3366f"
+        "proofInputDigestBoundSha": "76ca38abedff6a70193e700525a791ba9d7ac6fc"
       },
       "promotionHold": {
         "active": true,
@@ -201,10 +201,10 @@
       "verificationRef": "verification/smart-reader-cycle64-stdio-transport-rust-impl.json",
       "notes": "rej-010 rust_impl ONLY \u2014 cycle64 harness metadata: transport.stdio-rust-rmcp bounded differential re-verify (4 cases)"
     },
-    "notes": "FINISH-LINE-MCP-PAIR-TICK032: tool/read_media tip-bound differential_green + proofInputDigest @ 1a25cfb19845; transports remain proof.missing (allow-list honesty). NO promotions. completion_progress=0. NOT REPO_COMPLETE.",
-    "liveMainTip": "1a25cfb19845330fe91b79227a4398197cf3366f",
-    "lastMutation": "FINISH-LINE-MCP-PAIR-TICK032",
-    "updatedAt": "2026-07-11T21:17:39Z",
+    "notes": "FINISH-LINE-MCP-PASS-TICK035: tip-bound tool/read_media differential_green at 76ca38abedff (cases=6 read_media=3). proofInputDigest restamped. transport/* proof.missing retained (allow-list honesty). NO promotions. NOT REPO_COMPLETE.",
+    "liveMainTip": "76ca38abedff6a70193e700525a791ba9d7ac6fc",
+    "lastMutation": "FINISH-LINE-MCP-PASS-TICK035",
+    "updatedAt": "2026-07-12T00:08:08Z",
     "tick030_delta": {
       "packetId": "FINISH-LINE-NEAR-COMPLETE-TICK030",
       "read_media": "differential_green",
