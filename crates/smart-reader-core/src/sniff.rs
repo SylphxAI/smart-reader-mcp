@@ -300,4 +300,46 @@ mod tests {
         assert!(mislabel_warning(Path::new("a.jpg"), &unk).is_none());
     }
 
+
+    #[test]
+    fn starts_with_bounds_and_gif87a_tiff_mime() {
+        assert!(!starts_with(b"ab", b"abc", 0));
+        assert!(!starts_with(b"abc", b"ab", 2));
+        assert!(starts_with(b"abc", b"bc", 1));
+        assert_eq!(sniff_buffer(b"GIF87a......", None).format, "image/gif");
+        assert_eq!(
+            sniff_buffer(&[0x49, 0x49, 0x2a, 0x00], None).mime_type.as_deref(),
+            Some("image/tiff")
+        );
+        assert_eq!(mime_for_format("pdf"), Some("application/pdf"));
+        assert_eq!(mime_for_format("video/mp4"), Some("video/mp4"));
+        assert_eq!(mime_for_format("unknown"), None);
+        assert_eq!(category_for_format("pdf"), MediaCategory::Pdf);
+        assert_eq!(category_for_format("image/png"), MediaCategory::Image);
+        assert_eq!(category_for_format("video/mkv"), MediaCategory::Video);
+        assert_eq!(category_for_format("unknown"), MediaCategory::Unknown);
+        assert_eq!(read_ascii(b"hello", 1, 3), "ell");
+        assert_eq!(read_ascii(b"hi", 0, 10), "hi");
+    }
+
+    #[test]
+    fn extension_fallback_m4v_jpg_tif_and_mp4() {
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("clip.m4v"))).format,
+            "video/mp4"
+        );
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("a.JPG"))).format,
+            "image/jpeg"
+        );
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("scan.TIF"))).format,
+            "image/tiff"
+        );
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("movie.mkv"))).format,
+            "video/mkv"
+        );
+    }
+
 }

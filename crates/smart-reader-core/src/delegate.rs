@@ -213,4 +213,35 @@ mod tests {
         assert!(args.get("path").is_some() || args.get("source").is_some() || !args.as_object().unwrap().is_empty());
     }
 
+
+    #[test]
+    fn extract_raw_result_parses_content_json() {
+        use serde_json::json;
+        let env = json!({
+            "result": {
+                "content": [{"text": "{\"ok\":true}"}]
+            }
+        });
+        let v = extract_raw_result(&env, "read_image");
+        assert_eq!(v["ok"], true);
+
+        let env2 = json!({
+            "result": {
+                "content": [{"text": "plain"}]
+            }
+        });
+        assert_eq!(extract_raw_result(&env2, "t"), json!("plain"));
+
+        let env3 = json!({"result": {"status": "ok"}});
+        assert_eq!(extract_raw_result(&env3, "t")["status"], "ok");
+
+        let env4 = json!({"twin": {"a": 1}});
+        assert_eq!(extract_raw_result(&env4, "t")["a"], 1);
+
+        let env5 = json!({"results": [1, 2]});
+        assert_eq!(extract_raw_result(&env5, "t"), json!([1, 2]));
+
+        assert_eq!(extract_raw_result(&json!({}), "t"), json!({"tool": "t"}));
+    }
+
 }

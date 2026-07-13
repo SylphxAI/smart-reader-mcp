@@ -246,4 +246,21 @@ mod pure_residual_tests {
         assert_eq!(category_label(MediaCategory::Video), "video");
         assert_eq!(category_label(MediaCategory::Unknown), "unknown");
     }
+
+    #[test]
+    fn extension_matches_format_aliases_bw6() {
+        // Leading-dot contract (locked by extension_matches_format_table).
+        assert!(extension_matches_format(".tif", "image/tiff"));
+        assert!(extension_matches_format(".tiff", "image/tiff"));
+        assert!(extension_matches_format(".gif", "image/gif"));
+        assert!(extension_matches_format(".webp", "image/webp"));
+        assert!(extension_matches_format(".mkv", "video/mkv"));
+        assert!(extension_matches_format(".webm", "video/webm"));
+        assert!(extension_matches_format(".mp4", "video/mp4"));
+        assert!(!extension_matches_format(".jpg", "image/png"));
+        assert!(!extension_matches_format("jpg", "image/jpeg")); // no leading dot
+        assert!(!extension_matches_format("", "image/png"));
+        assert!(!extension_matches_format(".bin", "unknown"));
+    }
+
 }
