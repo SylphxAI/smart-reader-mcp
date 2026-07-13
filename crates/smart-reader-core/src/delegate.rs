@@ -273,4 +273,31 @@ mod tests {
         assert!(args.as_object().map(|m| !m.is_empty()).unwrap_or(false));
     }
 
+
+    #[test]
+    fn bw8_extract_raw_result_content_json_invalid_falls_to_text() {
+        use serde_json::json;
+        // invalid JSON text → plain string
+        let env = json!({"result": {"content": [{"text": "{not-json"}]}});
+        assert_eq!(extract_raw_result(&env, "t"), json!("{not-json"));
+        // valid JSON literal "42" parses as number (honest serde_json path)
+        let env = json!({"result": {"content": [{"text": "42"}]}});
+        assert_eq!(extract_raw_result(&env, "t"), json!(42));
+        // non-JSON plain text stays string
+        let env = json!({"result": {"content": [{"text": "not-json-at-all"}]}});
+        assert_eq!(extract_raw_result(&env, "t"), json!("not-json-at-all"));
+        assert_eq!(extract_raw_result(&json!({"results": {"a": 1}}), "t")["a"], 1);
+    }
+
+    #[test]
+    fn bw8_build_tool_args_path_keys() {
+        let args = build_tool_args(MediaCategory::Pdf, Path::new("/tmp/doc.pdf"));
+        let obj = args.as_object().expect("obj");
+        assert!(
+            obj.contains_key("path") || obj.contains_key("source") || !obj.is_empty(),
+            "{args}"
+        );
+        let args = build_tool_args(MediaCategory::Video, Path::new("/data/v.mkv"));
+        assert!(args.as_object().map(|m| !m.is_empty()).unwrap_or(false));
+    }
 }

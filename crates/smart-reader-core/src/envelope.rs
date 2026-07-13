@@ -274,4 +274,32 @@ mod pure_residual_tests {
         assert!(extension_matches_format(".m4v", "video/mp4"));
     }
 
+
+    #[test]
+    fn bw8_extension_matches_format_positive_full_table() {
+        assert!(extension_matches_format(".pdf", "pdf"));
+        assert!(extension_matches_format(".png", "image/png"));
+        assert!(extension_matches_format(".jpg", "image/jpeg"));
+        assert!(extension_matches_format(".jpeg", "image/jpeg"));
+        assert!(extension_matches_format(".gif", "image/gif"));
+        assert!(extension_matches_format(".webp", "image/webp"));
+        assert!(extension_matches_format(".tif", "image/tiff"));
+        assert!(extension_matches_format(".tiff", "image/tiff"));
+        assert!(extension_matches_format(".mp4", "video/mp4"));
+        assert!(extension_matches_format(".m4v", "video/mp4"));
+        assert!(extension_matches_format(".mkv", "video/mkv"));
+        assert!(extension_matches_format(".mov", "video/quicktime"));
+        assert!(extension_matches_format(".webm", "video/webm"));
+        assert!(!extension_matches_format("png", "image/png"));
+        assert!(!extension_matches_format(".png", "image/jpeg"));
+        assert!(!extension_matches_format("", "pdf"));
+    }
+
+    #[test]
+    fn bw8_category_label_all() {
+        assert_eq!(category_label(MediaCategory::Pdf), "pdf");
+        assert_eq!(category_label(MediaCategory::Image), "image");
+        assert_eq!(category_label(MediaCategory::Video), "video");
+        assert_eq!(category_label(MediaCategory::Unknown), "unknown");
+    }
 }

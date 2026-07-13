@@ -115,4 +115,15 @@ mod tests {
         assert!(resolve_media_path("\0", &cwd).is_err());
     }
 
+
+    #[test]
+    fn bw8_policy_rejects_whitespace_only_and_nested_parent() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let err = resolve_media_path("\t  \n", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidParams);
+        let err = resolve_media_path("sub/../../etc/passwd", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidRequest);
+        let err = resolve_media_path("missing.mp4", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidRequest);
+    }
 }

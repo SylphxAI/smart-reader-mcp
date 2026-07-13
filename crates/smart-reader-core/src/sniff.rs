@@ -394,4 +394,79 @@ mod tests {
         assert!(w.contains("image/png"));
     }
 
+
+    #[test]
+    fn bw8_ftyp_brands_and_tiff_endian_magic() {
+        let mut mp4 = vec![0u8; 12];
+        mp4[4..8].copy_from_slice(b"ftyp");
+        mp4[8..12].copy_from_slice(b"isom");
+        assert_eq!(sniff_from_magic_bytes(&mp4), "video/mp4");
+        let mut qt = vec![0u8; 12];
+        qt[4..8].copy_from_slice(b"ftyp");
+        qt[8..12].copy_from_slice(b"qt  ");
+        assert_eq!(sniff_from_magic_bytes(&qt), "video/quicktime");
+        assert_eq!(
+            sniff_from_magic_bytes(&[0x49, 0x49, 0x2a, 0x00]),
+            "image/tiff"
+        );
+        assert_eq!(
+            sniff_from_magic_bytes(&[0x4d, 0x4d, 0x00, 0x2a]),
+            "image/tiff"
+        );
+        assert_eq!(sniff_from_magic_bytes(b"xxxxftyp"), "unknown");
+    }
+
+    #[test]
+    fn bw8_webm_ebml_offset_and_mkv_default() {
+        let mut buf = vec![0x1a, 0x45, 0xdf, 0xa3];
+        buf.resize(40, 0);
+        assert_eq!(sniff_from_magic_bytes(&buf), "video/mkv");
+        buf[31..35].copy_from_slice(b"webm");
+        assert_eq!(sniff_from_magic_bytes(&buf), "video/webm");
+        assert_eq!(mime_for_format("video/mkv"), Some("video/x-matroska"));
+        assert_eq!(mime_for_format("video/webm"), Some("video/webm"));
+        assert_eq!(mime_for_format("nope"), None);
+    }
+
+    #[test]
+    fn bw8_extension_fallback_mov_webm_pdf_unknown() {
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("a.mov"))).format,
+            "video/quicktime"
+        );
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("a.webm"))).format,
+            "video/webm"
+        );
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("a.PDF"))).format,
+            "pdf"
+        );
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("a.bin"))).format,
+            "unknown"
+        );
+        assert_eq!(category_for_format("pdf"), MediaCategory::Pdf);
+        assert_eq!(category_for_format("image/x"), MediaCategory::Image);
+        assert_eq!(category_for_format("video/x"), MediaCategory::Video);
+    }
+
+    #[test]
+    fn bw8_mislabel_none_when_match_or_unknown() {
+        let path = Path::new("photo.png");
+        let sniffed = SniffResult {
+            category: MediaCategory::Image,
+            format: "image/png".into(),
+            mime_type: Some("image/png".into()),
+            route: "rust-smart-sniff".into(),
+        };
+        assert!(mislabel_warning(path, &sniffed).is_none());
+        let unk = SniffResult {
+            category: MediaCategory::Unknown,
+            format: "unknown".into(),
+            mime_type: None,
+            route: "rust-smart-sniff".into(),
+        };
+        assert!(mislabel_warning(Path::new("x.bin"), &unk).is_none());
+    }
 }
