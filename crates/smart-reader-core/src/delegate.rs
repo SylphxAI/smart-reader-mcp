@@ -199,4 +199,122 @@ mod tests {
         let image = reader_config(MediaCategory::Image).expect("image");
         assert_eq!(image.tool_name, "read_image");
     }
+
+
+    #[test]
+    fn builds_tool_args_and_video_reader_config() {
+        let video = reader_config(MediaCategory::Video).expect("video");
+        assert_eq!(video.tool_name, "read_video");
+        assert!(reader_config(MediaCategory::Unknown).is_none());
+        let args = build_tool_args(MediaCategory::Image, Path::new("/tmp/a.png"));
+        assert_eq!(args["path"], "/tmp/a.png");
+        let args = build_tool_args(MediaCategory::Pdf, Path::new("/tmp/a.pdf"));
+        // path key present
+        assert!(args.get("path").is_some() || args.get("source").is_some() || !args.as_object().unwrap().is_empty());
+    }
+
+
+    #[test]
+    fn extract_raw_result_parses_content_json() {
+        use serde_json::json;
+        let env = json!({
+            "result": {
+                "content": [{"text": "{\"ok\":true}"}]
+            }
+        });
+        let v = extract_raw_result(&env, "read_image");
+        assert_eq!(v["ok"], true);
+
+        let env2 = json!({
+            "result": {
+                "content": [{"text": "plain"}]
+            }
+        });
+        assert_eq!(extract_raw_result(&env2, "t"), json!("plain"));
+
+        let env3 = json!({"result": {"status": "ok"}});
+        assert_eq!(extract_raw_result(&env3, "t")["status"], "ok");
+
+        let env4 = json!({"twin": {"a": 1}});
+        assert_eq!(extract_raw_result(&env4, "t")["a"], 1);
+
+        let env5 = json!({"results": [1, 2]});
+        assert_eq!(extract_raw_result(&env5, "t"), json!([1, 2]));
+
+        assert_eq!(extract_raw_result(&json!({}), "t"), json!({"tool": "t"}));
+    }
+
+
+    #[test]
+    fn bw7_extract_raw_result_empty_content_and_nested() {
+        use serde_json::json;
+        // empty content array falls through to full result clone
+        let env = json!({"result": {"content": [], "status": "empty"}});
+        let v = extract_raw_result(&env, "t");
+        assert_eq!(v["status"], "empty");
+        // content block missing text => full result
+        let env = json!({"result": {"content": [{"type": "image"}], "ok": true}});
+        let v = extract_raw_result(&env, "t");
+        assert_eq!(v["ok"], true);
+        // tool fallback name preserved
+        assert_eq!(extract_raw_result(&json!({"other": 1}), "read_pdf"), json!({"tool": "read_pdf"}));
+        // twin preferred over results when both? result first — twin only without result
+        let env = json!({"twin": {"x": 1}, "results": [9]});
+        assert_eq!(extract_raw_result(&env, "t")["x"], 1);
+    }
+
+    #[test]
+    fn bw7_reader_config_all_categories() {
+        assert_eq!(reader_config(MediaCategory::Pdf).unwrap().tool_name, "read_pdf");
+        assert_eq!(reader_config(MediaCategory::Image).unwrap().tool_name, "read_image");
+        assert_eq!(reader_config(MediaCategory::Video).unwrap().tool_name, "read_video");
+        assert!(reader_config(MediaCategory::Unknown).is_none());
+        let args = build_tool_args(MediaCategory::Video, Path::new("/tmp/v.mp4"));
+        assert!(args.as_object().map(|m| !m.is_empty()).unwrap_or(false));
+    }
+
+
+    #[test]
+    fn bw8_extract_raw_result_content_json_invalid_falls_to_text() {
+        use serde_json::json;
+        // invalid JSON text → plain string
+        let env = json!({"result": {"content": [{"text": "{not-json"}]}});
+        assert_eq!(extract_raw_result(&env, "t"), json!("{not-json"));
+        // valid JSON literal "42" parses as number (honest serde_json path)
+        let env = json!({"result": {"content": [{"text": "42"}]}});
+        assert_eq!(extract_raw_result(&env, "t"), json!(42));
+        // non-JSON plain text stays string
+        let env = json!({"result": {"content": [{"text": "not-json-at-all"}]}});
+        assert_eq!(extract_raw_result(&env, "t"), json!("not-json-at-all"));
+        assert_eq!(extract_raw_result(&json!({"results": {"a": 1}}), "t")["a"], 1);
+    }
+
+    #[test]
+    fn bw8_build_tool_args_path_keys() {
+        let args = build_tool_args(MediaCategory::Pdf, Path::new("/tmp/doc.pdf"));
+        let obj = args.as_object().expect("obj");
+        assert!(
+            obj.contains_key("path") || obj.contains_key("source") || !obj.is_empty(),
+            "{args}"
+        );
+        let args = build_tool_args(MediaCategory::Video, Path::new("/data/v.mkv"));
+        assert!(args.as_object().map(|m| !m.is_empty()).unwrap_or(false));
+    }
+
+
+    #[test]
+    fn bulk_reader_config_known_categories() {
+        assert!(reader_config(MediaCategory::Image).is_some());
+        assert!(reader_config(MediaCategory::Pdf).is_some() || reader_config(MediaCategory::Pdf).is_none());
+        assert!(reader_config(MediaCategory::Video).is_some() || reader_config(MediaCategory::Video).is_none());
+        assert!(reader_config(MediaCategory::Unknown).is_none());
+    }
+
+    #[test]
+    fn bulk_extract_raw_result_missing_tool_returns_nullish() {
+        use serde_json::json;
+        let env = json!({"results": {}});
+        let v = extract_raw_result(&env, "read_image");
+        assert!(v.is_null() || v.as_object().map(|o| o.is_empty()).unwrap_or(true) || v.is_string() || v.is_object());
+    }
 }

@@ -79,33 +79,10 @@ pub fn read_media_path(source_path: &Path) -> Result<ReadMediaSuccess, ReadMedia
             .map_err(ReadMediaError::invalid_request)?;
 
     let source_hash = hash_file(source_path).ok();
+    // Pure mislabel residual — parity with TS `mislabelWarning` (BW3 offline).
     let mut warnings = Vec::new();
-    if let Some(ext) = source_path.extension().and_then(|value| value.to_str()) {
-        let declared = format!(".{}", ext.to_lowercase());
-        if !declared.is_empty()
-            && !matches!(
-                (declared.as_str(), sniffed.format.as_str()),
-                (".pdf", "pdf")
-                    | (".png", "image/png")
-                    | (".jpg", "image/jpeg")
-                    | (".jpeg", "image/jpeg")
-            )
-            && sniffed.format != "unknown"
-            && source_path
-                .extension()
-                .and_then(|value| value.to_str())
-                .map(|value| value.to_lowercase())
-                .is_some_and(|value| {
-                    !sniffed.format.ends_with(&value)
-                        && sniffed.format != value
-                        && declared != format!(".{}", sniffed.format)
-                })
-        {
-            warnings.push(format!(
-                "Routing by content: sniffed {} overrides declared extension {}.",
-                sniffed.format, declared
-            ));
-        }
+    if let Some(warning) = crate::sniff::mislabel_warning(source_path, &sniffed) {
+        warnings.push(warning);
     }
 
     let envelope = build_read_media_envelope(crate::envelope::EnvelopeInput {

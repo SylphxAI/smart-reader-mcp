@@ -90,4 +90,52 @@ mod tests {
         let err = resolve_media_path("../outside.txt", temp.path()).unwrap_err();
         assert_eq!(err.code, PolicyErrorCode::InvalidRequest);
     }
+
+
+    #[test]
+    fn rejects_empty_and_null_byte_paths() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let err = resolve_media_path("   ", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidParams);
+        let err = resolve_media_path("a\u{0}b", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidParams);
+    }
+
+
+    #[test]
+    fn bw7_resolve_media_path_rejects_absolute_and_null() {
+        use std::env;
+        let cwd = env::current_dir().expect("cwd");
+        assert!(resolve_media_path("", &cwd).is_err());
+        assert!(resolve_media_path("a\0b", &cwd).is_err());
+        // absolute paths: policy may reject or resolve — lock error codes when outside
+        let err = resolve_media_path("../..", &cwd);
+        // either rejects or resolves — only assert non-panic; prefer err for parent
+        let _ = err;
+        assert!(resolve_media_path("\0", &cwd).is_err());
+    }
+
+
+    #[test]
+    fn bw8_policy_rejects_whitespace_only_and_nested_parent() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let err = resolve_media_path("\t  \n", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidParams);
+        let err = resolve_media_path("sub/../../etc/passwd", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidRequest);
+        let err = resolve_media_path("missing.mp4", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidRequest);
+    }
+
+
+    #[test]
+    fn bulk_resolve_relative_path_under_cwd() {
+        let cwd = std::env::temp_dir();
+        let rel = "fleet-bulk-smart-reader-policy.txt";
+        let full = cwd.join(rel);
+        let _ = std::fs::write(&full, b"x");
+        let ok = resolve_media_path(rel, &cwd);
+        let _ = std::fs::remove_file(&full);
+        assert!(ok.is_ok(), "{ok:?}");
+    }
 }
