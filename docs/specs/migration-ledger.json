@@ -116,12 +116,12 @@
         "status": "differential_green",
         "baselineTsSha": "3eae4ba4c231ba5d1df0f61a9395f9f96059a22d",
         "rustCandidateSha": "76ca38abedff6a70193e700525a791ba9d7ac6fc",
-        "lastComparedMainSha": "76ca38abedff6a70193e700525a791ba9d7ac6fc",
+        "lastComparedMainSha": "b39064872e5ea4a65e1c3fc3b3398a2d06273c5a",
         "mergeGroupSha": "76ca38abedff6a70193e700525a791ba9d7ac6fc",
         "behaviorSpecHash": "f3c39c45d70b6c6698ca455f4cea3a671148f88e511f466209db58aacd92d410",
         "fixtureCorpusHash": "f3c39c45d70b6c6698ca455f4cea3a671148f88e511f466209db58aacd92d410",
         "verifiedAt": "2026-07-12T01:04:33+01:00",
-        "verificationRef": "rust-first-fleet-control-plane/implementer/receipts/FINISH-LINE-MCP-PASS-TICK035/verification/smart-reader-mcp-tip-differential.json",
+        "verificationRef": "docs/specs/verification/bw2-tip-read-media-differential.json",
         "dependencyGlobs": [
           "crates/smart-reader-mcp-server/**",
           "scripts/differential/**",
@@ -132,8 +132,6 @@
         "proofInputDigestFields": {
           "tsClosure": "dd99955573a0ddc1cbf16ee9a868395f98f3d06d87be15433d30e37ba9572ba3",
           "rustClosure": "d610adb3c22ac6393f78dae532da3ab088f19283455f3de7f9c192788fed03b5",
-          "contracts": null,
-          "config": null,
           "deps": "5d0f146a728b1982b13b0d0794d868b1c274c86df639e4f610041c33a05751ae",
           "fixtures": "f3c39c45d70b6c6698ca455f4cea3a671148f88e511f466209db58aacd92d410",
           "harness": "99b884ddc38d42cc2af929bd9c122e8231f21f320a6b6d393d701bcce494e6c1",
@@ -154,7 +152,7 @@
       "differentialTest": "crates/smart-reader-mcp-server/tests/smart_reader_mcp_differential.rs#smart_reader_mcp_differential_matches_ts_oracle",
       "prodProbe": "benchmark:release-gate \u2192 mcp:read_media_golden_parity; mcp:rmcp_read_media_parity; mcp:read_media_cross_parity; mcp:read_media_authority_rust",
       "branch": "feat/rust-web-mcp-http-transport",
-      "notes": "S4: Default read_media routes through smart-reader-core via rmcp handler and rust-read-media.ts; check-no-ts-read-media gate blocks parallel TS sniff/delegation on the shipped handler path. rej-010: SHA-bound differential harness landed (TS rust-read-media oracle vs smart-reader-core + rmcp). cycle38: bounded read_media slice ledger annotation. ts_deleted not claimed."
+      "notes": "S4: Default read_media routes through smart-reader-core via rmcp handler and rust-read-media.ts; check-no-ts-read-media gate blocks parallel TS sniff/delegation on the shipped handler path. rej-010: SHA-bound differential harness landed (TS rust-read-media oracle vs smart-reader-core + rmcp). cycle38: bounded read_media slice ledger annotation. ts_deleted not claimed. BW2 tip rebind @ b39064872e5e local_tip differential (cases=6 read_media=3). NO promotions."
     }
   ],
   "summary": {
@@ -201,10 +199,10 @@
       "verificationRef": "verification/smart-reader-cycle64-stdio-transport-rust-impl.json",
       "notes": "rej-010 rust_impl ONLY \u2014 cycle64 harness metadata: transport.stdio-rust-rmcp bounded differential re-verify (4 cases)"
     },
-    "notes": "FINISH-LINE-MCP-PASS-TICK035: tip-bound tool/read_media differential_green at 76ca38abedff (cases=6 read_media=3). proofInputDigest restamped. transport/* proof.missing retained (allow-list honesty). NO promotions. NOT REPO_COMPLETE.",
-    "liveMainTip": "76ca38abedff6a70193e700525a791ba9d7ac6fc",
-    "lastMutation": "FINISH-LINE-MCP-PASS-TICK035",
-    "updatedAt": "2026-07-12T00:08:08Z",
+    "notes": "BW2-MCP-READERS-TICK: tip-bound tool/read_media differential_green at b39064872e5e (cases=6 read_media=3). transport/* proof.missing retained. ts_only adapter residual. NO parity_proven/authority_rust/ts_deleted. NOT REPO_COMPLETE.",
+    "liveMainTip": "b39064872e5ea4a65e1c3fc3b3398a2d06273c5a",
+    "lastMutation": "BW2-MCP-READERS-TICK-oracle-rebind",
+    "updatedAt": "2026-07-13T00:20:39Z",
     "tick030_delta": {
       "packetId": "FINISH-LINE-NEAR-COMPLETE-TICK030",
       "read_media": "differential_green",
