@@ -90,4 +90,15 @@ mod tests {
         let err = resolve_media_path("../outside.txt", temp.path()).unwrap_err();
         assert_eq!(err.code, PolicyErrorCode::InvalidRequest);
     }
+
+
+    #[test]
+    fn rejects_empty_and_null_byte_paths() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let err = resolve_media_path("   ", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidParams);
+        let err = resolve_media_path("a\u{0}b", temp.path()).unwrap_err();
+        assert_eq!(err.code, PolicyErrorCode::InvalidParams);
+    }
+
 }

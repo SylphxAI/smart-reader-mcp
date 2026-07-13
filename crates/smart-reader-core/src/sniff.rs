@@ -241,4 +241,63 @@ mod tests {
         );
         assert!(mislabel_warning(Path::new("x.bin"), &unk).is_none());
     }
+
+
+    #[test]
+    fn detects_mkv_and_webm_ebml() {
+        // EBML header 1A 45 DF A3 — without webm brand => mkv
+        let mut mkv = vec![0x1a, 0x45, 0xdf, 0xa3];
+        mkv.resize(40, 0);
+        assert_eq!(sniff_buffer(&mkv, None).format, "video/mkv");
+        assert_eq!(sniff_buffer(&mkv, None).category, MediaCategory::Video);
+        assert_eq!(
+            sniff_buffer(&mkv, None).mime_type.as_deref(),
+            Some("video/x-matroska")
+        );
+        // brand "webm" at offset 31
+        let mut webm = vec![0x1a, 0x45, 0xdf, 0xa3];
+        webm.resize(40, 0);
+        webm[31..35].copy_from_slice(b"webm");
+        assert_eq!(sniff_buffer(&webm, None).format, "video/webm");
+        assert_eq!(
+            sniff_buffer(&webm, None).mime_type.as_deref(),
+            Some("video/webm")
+        );
+    }
+
+    #[test]
+    fn extension_fallback_covers_video_exts_and_unknown() {
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("clip.MOV"))).format,
+            "video/quicktime"
+        );
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("a.webm"))).format,
+            "video/webm"
+        );
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("x.bin"))).format,
+            "unknown"
+        );
+        assert_eq!(
+            sniff_buffer(b"???", Some(Path::new("x.bin"))).category,
+            MediaCategory::Unknown
+        );
+    }
+
+    #[test]
+    fn mislabel_jpeg_as_png_and_unknown_sniff_none() {
+        let jpeg = sniff_buffer(&[0xff, 0xd8, 0xff, 0xe0], Some(Path::new("photo.png")));
+        let warning = mislabel_warning(Path::new("photo.png"), &jpeg).expect("warn");
+        assert!(warning.contains("image/png"));
+        assert!(warning.contains("image/jpeg"));
+        let unk = SniffResult {
+            category: MediaCategory::Unknown,
+            format: "unknown".into(),
+            mime_type: None,
+            route: SNIFF_ROUTE.into(),
+        };
+        assert!(mislabel_warning(Path::new("a.jpg"), &unk).is_none());
+    }
+
 }

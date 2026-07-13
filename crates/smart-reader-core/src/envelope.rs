@@ -221,3 +221,29 @@ fn chrono_now_iso() -> String {
         .unwrap_or_default();
     format!("{}Z", elapsed.as_secs())
 }
+
+#[cfg(test)]
+mod pure_residual_tests {
+    use super::*;
+
+    #[test]
+    fn extension_matches_format_table() {
+        assert!(extension_matches_format(".pdf", "pdf"));
+        assert!(extension_matches_format(".png", "image/png"));
+        assert!(extension_matches_format(".jpg", "image/jpeg"));
+        assert!(extension_matches_format(".jpeg", "image/jpeg"));
+        assert!(extension_matches_format(".m4v", "video/mp4"));
+        assert!(extension_matches_format(".mov", "video/quicktime"));
+        assert!(!extension_matches_format(".png", "image/jpeg"));
+        assert!(!extension_matches_format(".pdf", "image/png"));
+        assert!(!extension_matches_format("png", "image/png")); // requires leading dot
+    }
+
+    #[test]
+    fn category_label_covers_all_variants() {
+        assert_eq!(category_label(MediaCategory::Pdf), "pdf");
+        assert_eq!(category_label(MediaCategory::Image), "image");
+        assert_eq!(category_label(MediaCategory::Video), "video");
+        assert_eq!(category_label(MediaCategory::Unknown), "unknown");
+    }
+}

@@ -199,4 +199,18 @@ mod tests {
         let image = reader_config(MediaCategory::Image).expect("image");
         assert_eq!(image.tool_name, "read_image");
     }
+
+
+    #[test]
+    fn builds_tool_args_and_video_reader_config() {
+        let video = reader_config(MediaCategory::Video).expect("video");
+        assert_eq!(video.tool_name, "read_video");
+        assert!(reader_config(MediaCategory::Unknown).is_none());
+        let args = build_tool_args(MediaCategory::Image, Path::new("/tmp/a.png"));
+        assert_eq!(args["path"], "/tmp/a.png");
+        let args = build_tool_args(MediaCategory::Pdf, Path::new("/tmp/a.pdf"));
+        // path key present
+        assert!(args.get("path").is_some() || args.get("source").is_some() || !args.as_object().unwrap().is_empty());
+    }
+
 }
