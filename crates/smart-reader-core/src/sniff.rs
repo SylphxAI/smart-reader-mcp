@@ -143,6 +143,23 @@ pub fn sniff_file(path: &Path) -> Result<SniffResult, String> {
     Ok(sniff_buffer(sample, Some(path)))
 }
 
+
+/// Pure mislabel warning — parity with TS `src/sniff/mislabel.ts#mislabelWarning`.
+/// Returns None when extension is unknown, sniffed format is unknown, or they match.
+pub fn mislabel_warning(file_path: &Path, sniffed: &SniffResult) -> Option<String> {
+    let declared = sniff_from_extension(file_path);
+    if declared == "unknown" || sniffed.format == "unknown" {
+        return None;
+    }
+    if declared == sniffed.format {
+        return None;
+    }
+    Some(format!(
+        "File extension suggests {declared} but magic-byte sniff detected {}; routing by content.",
+        sniffed.format
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -173,5 +190,55 @@ mod tests {
     fn falls_back_to_extension_when_magic_unknown() {
         let result = sniff_buffer(b"unknown", Some(Path::new("/tmp/sample.PDF")));
         assert_eq!(result.format, "pdf");
+    }
+
+    #[test]
+    fn detects_jpeg_gif_webp_tiff_magic() {
+        assert_eq!(sniff_buffer(&[0xff, 0xd8, 0xff, 0xe0], None).format, "image/jpeg");
+        assert_eq!(sniff_buffer(b"GIF89a......", None).format, "image/gif");
+        let mut webp = b"RIFF".to_vec();
+        webp.extend_from_slice(&[0, 0, 0, 0]);
+        webp.extend_from_slice(b"WEBP");
+        assert_eq!(sniff_buffer(&webp, None).format, "image/webp");
+        assert_eq!(
+            sniff_buffer(&[0x49, 0x49, 0x2a, 0x00, 0, 0], None).format,
+            "image/tiff"
+        );
+        assert_eq!(
+            sniff_buffer(&[0x4d, 0x4d, 0x00, 0x2a, 0, 0], None).format,
+            "image/tiff"
+        );
+    }
+
+    #[test]
+    fn detects_mp4_and_quicktime_ftyp() {
+        let mut mp4 = vec![0, 0, 0, 0x18];
+        mp4.extend_from_slice(b"ftypisom");
+        assert_eq!(sniff_buffer(&mp4, None).format, "video/mp4");
+        let mut qt = vec![0, 0, 0, 0x18];
+        qt.extend_from_slice(b"ftypqt  ");
+        assert_eq!(sniff_buffer(&qt, None).format, "video/quicktime");
+    }
+
+    #[test]
+    fn mislabel_warning_matches_ts_contract() {
+        let sniffed = sniff_buffer(
+            &[0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+            Some(Path::new("png-as-pdf.pdf")),
+        );
+        let warning = mislabel_warning(Path::new("png-as-pdf.pdf"), &sniffed).expect("warn");
+        assert!(warning.contains("File extension suggests pdf"));
+        assert!(warning.contains("image/png"));
+        assert!(warning.contains("routing by content"));
+        let ok = sniff_buffer(
+            &[0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+            Some(Path::new("ok.png")),
+        );
+        assert!(mislabel_warning(Path::new("ok.png"), &ok).is_none());
+        let unk = sniff_buffer(
+            &[0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a],
+            Some(Path::new("x.bin")),
+        );
+        assert!(mislabel_warning(Path::new("x.bin"), &unk).is_none());
     }
 }
