@@ -126,4 +126,16 @@ mod tests {
         let err = resolve_media_path("missing.mp4", temp.path()).unwrap_err();
         assert_eq!(err.code, PolicyErrorCode::InvalidRequest);
     }
+
+
+    #[test]
+    fn bulk_resolve_relative_path_under_cwd() {
+        let cwd = std::env::temp_dir();
+        let rel = "fleet-bulk-smart-reader-policy.txt";
+        let full = cwd.join(rel);
+        let _ = std::fs::write(&full, b"x");
+        let ok = resolve_media_path(rel, &cwd);
+        let _ = std::fs::remove_file(&full);
+        assert!(ok.is_ok(), "{ok:?}");
+    }
 }

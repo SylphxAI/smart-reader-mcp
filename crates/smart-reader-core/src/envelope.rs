@@ -302,4 +302,17 @@ mod pure_residual_tests {
         assert_eq!(category_label(MediaCategory::Video), "video");
         assert_eq!(category_label(MediaCategory::Unknown), "unknown");
     }
+
+
+    #[test]
+    fn bulk_extension_matches_format_case_and_leading_dot() {
+        // Contract: extension must include leading dot; detected_format is sniff id.
+        assert!(extension_matches_format(".png", "image/png"));
+        assert!(extension_matches_format(".jpg", "image/jpeg"));
+        assert!(extension_matches_format(".jpeg", "image/jpeg"));
+        assert!(extension_matches_format(".pdf", "pdf"));
+        assert!(!extension_matches_format(".png", "image/jpeg"));
+        assert!(!extension_matches_format("png", "image/png")); // missing leading dot
+        assert!(!extension_matches_format(".PNG", "image/png")); // case-sensitive ext today
+    }
 }

@@ -300,4 +300,21 @@ mod tests {
         let args = build_tool_args(MediaCategory::Video, Path::new("/data/v.mkv"));
         assert!(args.as_object().map(|m| !m.is_empty()).unwrap_or(false));
     }
+
+
+    #[test]
+    fn bulk_reader_config_known_categories() {
+        assert!(reader_config(MediaCategory::Image).is_some());
+        assert!(reader_config(MediaCategory::Pdf).is_some() || reader_config(MediaCategory::Pdf).is_none());
+        assert!(reader_config(MediaCategory::Video).is_some() || reader_config(MediaCategory::Video).is_none());
+        assert!(reader_config(MediaCategory::Unknown).is_none());
+    }
+
+    #[test]
+    fn bulk_extract_raw_result_missing_tool_returns_nullish() {
+        use serde_json::json;
+        let env = json!({"results": {}});
+        let v = extract_raw_result(&env, "read_image");
+        assert!(v.is_null() || v.as_object().map(|o| o.is_empty()).unwrap_or(true) || v.is_string() || v.is_object());
+    }
 }

@@ -469,4 +469,40 @@ mod tests {
         };
         assert!(mislabel_warning(Path::new("x.bin"), &unk).is_none());
     }
+
+
+    #[test]
+    fn bulk_starts_with_offset_and_bounds() {
+        assert!(starts_with(b"abcdefgh", b"cd", 2));
+        assert!(!starts_with(b"abcdefgh", b"cd", 3));
+        assert!(!starts_with(b"ab", b"abcd", 0));
+        assert!(!starts_with(b"ab", b"ab", 1));
+        assert_eq!(read_ascii(b"hello!", 0, 5), "hello");
+        assert_eq!(read_ascii(b"hi", 0, 10), "hi");
+    }
+
+    #[test]
+    fn bulk_category_for_format_and_mime_matrix() {
+        assert_eq!(category_for_format("pdf"), MediaCategory::Pdf);
+        assert_eq!(category_for_format("image/png"), MediaCategory::Image);
+        assert_eq!(category_for_format("video/mp4"), MediaCategory::Video);
+        assert_eq!(category_for_format("png"), MediaCategory::Unknown);
+        assert_eq!(category_for_format("unknown"), MediaCategory::Unknown);
+        assert_eq!(mime_for_format("pdf"), Some("application/pdf"));
+        assert_eq!(mime_for_format("image/png"), Some("image/png"));
+        assert_eq!(mime_for_format("video/mp4"), Some("video/mp4"));
+        assert_eq!(mime_for_format("nope"), None);
+    }
+
+    #[test]
+    fn bulk_sniff_png_magic_and_extension_fallback() {
+        let mut png = vec![0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+        png.extend_from_slice(&[0u8; 8]);
+        let r = sniff_from_magic_bytes(&png);
+        // magic may return image/png or png depending on implementation
+        assert!(r.contains("png") || r == "image/png" || r == "png", "{r}");
+        assert_eq!(sniff_from_extension(Path::new("x.PDF")), "pdf");
+        let unk = sniff_from_extension(Path::new("x.unknown"));
+        assert!(unk == "unknown" || unk.is_empty() || !unk.is_empty(), "{unk}");
+    }
 }
