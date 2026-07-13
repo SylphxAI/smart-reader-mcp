@@ -244,4 +244,33 @@ mod tests {
         assert_eq!(extract_raw_result(&json!({}), "t"), json!({"tool": "t"}));
     }
 
+
+    #[test]
+    fn bw7_extract_raw_result_empty_content_and_nested() {
+        use serde_json::json;
+        // empty content array falls through to full result clone
+        let env = json!({"result": {"content": [], "status": "empty"}});
+        let v = extract_raw_result(&env, "t");
+        assert_eq!(v["status"], "empty");
+        // content block missing text => full result
+        let env = json!({"result": {"content": [{"type": "image"}], "ok": true}});
+        let v = extract_raw_result(&env, "t");
+        assert_eq!(v["ok"], true);
+        // tool fallback name preserved
+        assert_eq!(extract_raw_result(&json!({"other": 1}), "read_pdf"), json!({"tool": "read_pdf"}));
+        // twin preferred over results when both? result first — twin only without result
+        let env = json!({"twin": {"x": 1}, "results": [9]});
+        assert_eq!(extract_raw_result(&env, "t")["x"], 1);
+    }
+
+    #[test]
+    fn bw7_reader_config_all_categories() {
+        assert_eq!(reader_config(MediaCategory::Pdf).unwrap().tool_name, "read_pdf");
+        assert_eq!(reader_config(MediaCategory::Image).unwrap().tool_name, "read_image");
+        assert_eq!(reader_config(MediaCategory::Video).unwrap().tool_name, "read_video");
+        assert!(reader_config(MediaCategory::Unknown).is_none());
+        let args = build_tool_args(MediaCategory::Video, Path::new("/tmp/v.mp4"));
+        assert!(args.as_object().map(|m| !m.is_empty()).unwrap_or(false));
+    }
+
 }

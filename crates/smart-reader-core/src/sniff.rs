@@ -342,4 +342,56 @@ mod tests {
         );
     }
 
+
+    #[test]
+    fn bw7_mime_and_category_full_table() {
+        let pairs = [
+            ("pdf", Some("application/pdf"), MediaCategory::Pdf),
+            ("image/png", Some("image/png"), MediaCategory::Image),
+            ("image/jpeg", Some("image/jpeg"), MediaCategory::Image),
+            ("image/gif", Some("image/gif"), MediaCategory::Image),
+            ("image/webp", Some("image/webp"), MediaCategory::Image),
+            ("image/tiff", Some("image/tiff"), MediaCategory::Image),
+            ("video/mp4", Some("video/mp4"), MediaCategory::Video),
+            ("video/mkv", Some("video/x-matroska"), MediaCategory::Video),
+            ("video/quicktime", Some("video/quicktime"), MediaCategory::Video),
+            ("video/webm", Some("video/webm"), MediaCategory::Video),
+            ("unknown", None, MediaCategory::Unknown),
+        ];
+        for (fmt, mime, cat) in pairs {
+            assert_eq!(mime_for_format(fmt), mime, "{fmt}");
+            assert_eq!(category_for_format(fmt), cat, "{fmt}");
+        }
+    }
+
+    #[test]
+    fn bw7_sniff_short_buffers_and_extension_case() {
+        // too short for signatures
+        assert_eq!(sniff_buffer(b"", None).format, "unknown");
+        assert_eq!(sniff_buffer(b"%PD", None).format, "unknown");
+        assert_eq!(sniff_buffer(&[0xff, 0xd8], None).format, "unknown"); // need 3 jpeg bytes
+        // extension case-insensitive
+        assert_eq!(sniff_buffer(b"???", Some(Path::new("X.PnG"))).format, "image/png");
+        assert_eq!(sniff_buffer(b"???", Some(Path::new("Clip.MoV"))).format, "video/quicktime");
+        assert_eq!(sniff_buffer(b"???", Some(Path::new("Doc.PDF"))).format, "pdf");
+    }
+
+    #[test]
+    fn bw7_starts_with_and_read_ascii_edges() {
+        assert!(starts_with(b"", b"", 0)); // empty sig always matches if in bounds
+        assert!(!starts_with(b"a", b"a", 1));
+        assert_eq!(read_ascii(b"abcd", 4, 2), "");
+        assert_eq!(read_ascii(b"abcd", 2, 0), "");
+        assert_eq!(read_ascii(b"", 0, 5), "");
+    }
+
+    #[test]
+    fn bw7_mislabel_video_ext_vs_image_magic() {
+        let png = [0x89u8, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+        let sniffed = sniff_buffer(&png, Some(Path::new("clip.mp4")));
+        let w = mislabel_warning(Path::new("clip.mp4"), &sniffed).expect("warn");
+        assert!(w.contains("video/mp4"));
+        assert!(w.contains("image/png"));
+    }
+
 }

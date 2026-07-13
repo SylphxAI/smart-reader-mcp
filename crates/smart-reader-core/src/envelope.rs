@@ -263,4 +263,15 @@ mod pure_residual_tests {
         assert!(!extension_matches_format(".bin", "unknown"));
     }
 
+
+    #[test]
+    fn bw7_extension_matches_format_negative_matrix() {
+        assert!(!extension_matches_format(".pdf", "image/png"));
+        assert!(!extension_matches_format(".mp4", "video/webm"));
+        assert!(!extension_matches_format(".mov", "video/mp4"));
+        assert!(!extension_matches_format(".TIFF", "image/tiff")); // exact match only, case-sensitive
+        assert!(extension_matches_format(".jpeg", "image/jpeg"));
+        assert!(extension_matches_format(".m4v", "video/mp4"));
+    }
+
 }

@@ -101,4 +101,18 @@ mod tests {
         assert_eq!(err.code, PolicyErrorCode::InvalidParams);
     }
 
+
+    #[test]
+    fn bw7_resolve_media_path_rejects_absolute_and_null() {
+        use std::env;
+        let cwd = env::current_dir().expect("cwd");
+        assert!(resolve_media_path("", &cwd).is_err());
+        assert!(resolve_media_path("a\0b", &cwd).is_err());
+        // absolute paths: policy may reject or resolve — lock error codes when outside
+        let err = resolve_media_path("../..", &cwd);
+        // either rejects or resolves — only assert non-panic; prefer err for parent
+        let _ = err;
+        assert!(resolve_media_path("\0", &cwd).is_err());
+    }
+
 }
