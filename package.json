@@ -18,7 +18,7 @@
     "LICENSE"
   ],
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/doctor-cli.js"
   },
   "repository": {
     "type": "git",
@@ -41,25 +41,27 @@
   "scripts": {
     "build:rust": "cargo build --release -p smart-reader-core -p smart-reader-cli -p smart-reader-mcp-server && bun scripts/stage-rust-mcp.ts",
     "test:rust": "cargo test",
-    "build": "tsc --project tsconfig.build.json",
-    "start": "node dist/index.js",
+    "build": "bun build src/doctor-cli.ts --outdir dist --target node",
+    "start": "./bin/smart-reader-mcp",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "test:rust-sniff": "cargo test && bun test test/rustSniff.boundary.test.ts",
     "test:watch": "bun test --watch",
     "check": "biome check .",
     "check:fix": "biome check --write .",
+    "check:ts-adapter-deleted": "bash scripts/check-ts-adapter-deletion-ready.sh",
+    "check:no-ts-stdio-mcp": "bash scripts/check-no-ts-stdio-mcp.sh",
     "sync:server-json": "bun scripts/sync-server-json.ts",
     "sync:platform-versions": "bun scripts/sync-platform-versions.ts",
     "assemble:multiarch": "bun scripts/assemble-multiarch-natives.ts",
     "verify:multiarch-readback": "bun scripts/verify-multiarch-readback.ts",
     "version-packages": "changeset version && bun run sync:server-json && bun run sync:platform-versions",
-    "validate": "bun run check && bun run typecheck && bun run build && bun run test",
-    "doctor": "bun run src/index.ts doctor",
+    "validate": "bun run check && bun run typecheck && bun run test && bun run check:ts-adapter-deleted && bun run check:no-ts-stdio-mcp",
+    "doctor": "bun run src/doctor-cli.ts",
     "benchmark:release-gate": "bun scripts/release-gate.ts",
     "clean": "rm -rf dist coverage",
-    "prepublishOnly": "bun run clean && bun run build",
-    "release": "bun scripts/sync-platform-versions.ts && bun scripts/publish-platform-packages.ts && bun run typecheck && bun run check && bun run build && bun test && changeset publish"
+    "prepublishOnly": "bun run clean && bun run build && bun run build:rust",
+    "release": "bun scripts/sync-platform-versions.ts && bun scripts/publish-platform-packages.ts && bun run typecheck && bun run check && bun run build && bun test && bun run check:ts-adapter-deleted && changeset publish"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
