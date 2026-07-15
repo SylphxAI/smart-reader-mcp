@@ -1,7 +1,27 @@
-# Smart Reader MCP Agent Instructions
+# smart-reader-mcp — local agent notes only
 
-Read `README.md`, `PROJECT.md`, and `docs/adr/0001-boundary.md` before implementing.
+Doctrine and fleet delivery law live in the **host always-on constitution**
+(`~/.grok/AGENTS.md` / Doctrine template). This file must **not** restate,
+weaken, or fork that law (including PR-vs-direct-trunk delivery).
 
-Portfolio rules live in `docs/adr/0002-reader-portfolio-architecture.md` (this repo).
+Local truth: `PROJECT.md`, `.doctrine/project.json` when present.
 
-Non-negotiables: local-first default, read≠interpret, typed MCP schemas, provenance on every output, Changesets release only.
+## Boundary hazards
+
+- Never commit secrets, tokens, `.env` files, or credentials.
+
+## Local commands
+
+- `bun run typecheck`
+- `bun run test`
+- `bun run build`
+- `bun run check`
+- `bun run validate`
+- `cargo test --workspace`
+- Prefer the **narrowest** affected check before full workspace runs.
+- Report layers honestly: local diff · trunk FF · deploy · prod proof (do not collapse).
+
+## Validation notes
+
+- Prefer the **narrowest** affected check before full workspace runs.
+- Report layers honestly: local diff · trunk FF · deploy · prod proof (do not collapse).
