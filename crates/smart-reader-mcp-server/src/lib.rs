@@ -7,7 +7,20 @@ use rmcp::{
     model::{Implementation, ServerCapabilities, ServerInfo},
     tool, tool_handler, tool_router, ErrorData, ServerHandler,
 };
-use serde_json::Value;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
+
+/// Free-form MCP tool args object (root type=object required by rmcp ≥1.8 schema gate).
+#[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(transparent)]
+struct FreeformToolArgs(Map<String, Value>);
+
+impl FreeformToolArgs {
+    fn into_value(self) -> Value {
+        Value::Object(self.0)
+    }
+}
 
 pub const SERVER_NAME: &str = "smart-reader-mcp";
 pub const SERVER_VERSION: &str = "0.1.1";
@@ -32,33 +45,27 @@ impl SmartReaderMcp {
     #[tool(
         description = "Read a local PDF, image, or video by sniffing format and delegating to the matching Sylphx Reader sibling MCP package."
     )]
-    pub fn read_media(
+    fn read_media(
         &self,
-        Parameters(args): Parameters<Value>,
+        Parameters(args): Parameters<FreeformToolArgs>,
     ) -> Result<rmcp::model::CallToolResult, ErrorData> {
-        read_media::read_media(args)
+        read_media::read_media(args.into_value())
     }
 }
 
 #[tool_handler]
 impl ServerHandler for SmartReaderMcp {
     fn get_info(&self) -> ServerInfo {
-        ServerInfo {
-            protocol_version: rmcp::model::ProtocolVersion::default(),
-            capabilities: ServerCapabilities::builder().enable_tools().build(),
-            server_info: Implementation {
-                name: SERVER_NAME.into(),
-                title: None,
-                version: SERVER_VERSION.into(),
-                description: Some(
-                    "Rust-native MCP server for smart-reader-mcp (modelcontextprotocol/rust-sdk rmcp)"
-                        .into(),
-                ),
-                icons: None,
-                website_url: Some("https://github.com/SylphxAI/smart-reader-mcp".into()),
-            },
-            instructions: Some(SERVER_INSTRUCTIONS.into()),
-        }
+        // rmcp >=1.8: ServerInfo/Implementation are #[non_exhaustive] — use builders only.
+        ServerInfo::new(ServerCapabilities::builder().enable_tools().build())
+            .with_server_info(
+                Implementation::new(SERVER_NAME, SERVER_VERSION)
+                    .with_description(
+                        "Rust-native MCP server for smart-reader-mcp (modelcontextprotocol/rust-sdk rmcp)",
+                    )
+                    .with_website_url("https://github.com/SylphxAI/smart-reader-mcp"),
+            )
+            .with_instructions(SERVER_INSTRUCTIONS)
     }
 }
 

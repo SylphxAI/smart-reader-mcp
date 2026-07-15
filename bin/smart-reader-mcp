@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Smart Reader MCP launcher — Rust rmcp default (fail-closed).
+# Smart Reader MCP launcher — Rust rmcp only (fail-closed, no TS stdio fallback).
 # Resolves platform-matched native via optionalDependencies, staged bin/native, or local cargo target.
-# Residual TS adapter: SMART_READER_MCP_TRANSPORT=ts or argv ts only (explicit opt-in).
 set -euo pipefail
 
 # Resolve this script's directory even when npm installs a .bin symlink.
@@ -17,7 +16,6 @@ resolve_bin_dir() {
 }
 
 ROOT="$(cd "$(resolve_bin_dir)/.." && pwd)"
-TS_ENTRY="$ROOT/dist/index.js"
 
 host_platform_key() {
 	local os arch
@@ -148,22 +146,29 @@ resolve_rust_bin() {
 	return 1
 }
 
-use_ts_transport() {
-	[[ "${SMART_READER_MCP_TRANSPORT:-}" == "ts" ]] || [[ "${1:-}" == "ts" ]]
+resolve_transport() {
+	if [[ -n "${SMART_READER_MCP_TRANSPORT:-}" ]]; then
+		printf '%s\n' "${SMART_READER_MCP_TRANSPORT}"
+		return 0
+	fi
+	if [[ -n "${MCP_TRANSPORT:-}" ]]; then
+		printf '%s\n' "${MCP_TRANSPORT}"
+		return 0
+	fi
+	printf '%s\n' "stdio"
 }
 
-if use_ts_transport "$@"; then
-	if [[ "${1:-}" == "ts" ]]; then
-		shift
+if bin="$(resolve_rust_bin)"; then
+	transport="$(resolve_transport)"
+	if [[ "$transport" == "http" ]]; then
+		export MCP_TRANSPORT=http
+		export SMART_READER_MCP_TRANSPORT=http
 	fi
-	if [[ ! -f "$TS_ENTRY" ]]; then
-		echo "[smart-reader-mcp] TS adapter missing at dist/index.js — run: bun run build" >&2
+	# Reject residual TS transport opt-in — Rust rmcp is sole MCP authority.
+	if [[ "$transport" == "ts" ]]; then
+		echo "[smart-reader-mcp] SMART_READER_MCP_TRANSPORT=ts is retired. Rust rmcp is the sole MCP transport." >&2
 		exit 1
 	fi
-	exec node "$TS_ENTRY" "$@"
-fi
-
-if bin="$(resolve_rust_bin)"; then
 	exec "$bin" "$@"
 fi
 
@@ -177,5 +182,4 @@ else
 	echo "[smart-reader-mcp] Unsupported platform for published natives. Supported: darwin-arm64, darwin-x64, linux-x64, linux-arm64." >&2
 	echo "[smart-reader-mcp] Build from source: bun run build:rust" >&2
 fi
-echo "[smart-reader-mcp] Residual TS adapter: SMART_READER_MCP_TRANSPORT=ts (opt-in only)." >&2
 exit 1
