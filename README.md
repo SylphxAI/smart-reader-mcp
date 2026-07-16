@@ -2,6 +2,11 @@
 
 # 🧠 Smart Reader MCP
 
+<p align="center">
+  <img src="docs/banner.png" alt="smart-reader-mcp banner" width="100%" />
+</p>
+
+
 ### Your agent found a file. **Did it pick the right reader?**
 
 One MCP call reads PDF, image, or video. Smart Reader sniffs format, delegates to
