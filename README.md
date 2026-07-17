@@ -3,9 +3,8 @@
 # 🧠 Smart Reader MCP
 
 <p align="center">
-  <img src="docs/banner.png" alt="smart-reader-mcp banner" width="100%" />
+  <img src="https://mark.sylphx.com/api/v1/banner?type=liquid&theme=tokyonight&text=smart+reader+mcp&desc=One+MCP+call+reads+PDF%2C+image%2C+or+video+by+sniffing+format+and+delegating+to+Syl&height=200&animation=rise&credit=0" alt="smart-reader-mcp — Sylphx Mark banner" width="100%" />
 </p>
-
 
 ### Your agent found a file. **Did it pick the right reader?**
 
