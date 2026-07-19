@@ -23,5 +23,4 @@ jobs:
       - run: bun run build
       - run: bun test
       - run: bun run test:rust-sniff
-      - run: bun test test/readmeDiscovery.test.ts
       - run: bun run benchmark:release-gate

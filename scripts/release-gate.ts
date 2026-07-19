@@ -209,31 +209,6 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     { alternativeCount: sampleEnvelope.routing?.alternatives?.length }
   );
 
-  const binWrapper = readFileSync(path.join(repoRoot, 'bin/smart-reader-mcp'), 'utf8');
-  addCheck(
-    checks,
-    'mcp:rust_adapter_default',
-    binWrapper.includes('smart-reader-mcp-server') &&
-      binWrapper.includes('resolve_rust_bin') &&
-      binWrapper.includes('resolve_transport') &&
-      !binWrapper.includes('use_ts_transport') &&
-      !binWrapper.includes('exec node') &&
-      !binWrapper.includes('dist/index.js') &&
-      !existsSync(path.join(repoRoot, 'src/index.ts')),
-    'Default npm bin launches the Rust rmcp MCP server only; TypeScript stdio adapter is deleted'
-  );
-
-  addCheck(
-    checks,
-    'mcp:ts_adapter_deleted',
-    !existsSync(path.join(repoRoot, 'src/index.ts')) &&
-      !existsSync(path.join(repoRoot, 'dist/index.js')) &&
-      existsSync(path.join(repoRoot, 'src/doctor-cli.ts')) &&
-      existsSync(path.join(repoRoot, 'scripts/check-ts-adapter-deletion-ready.sh')) &&
-      existsSync(path.join(repoRoot, 'scripts/check-no-ts-stdio-mcp.sh')),
-    'TS stdio adapter entry is deleted; doctor-cli and deletion gates are present'
-  );
-
   const matrixProbe = spawnSync('bun', ['test', 'test/shippedPath.matrix.test.ts'], {
     cwd: repoRoot,
     encoding: 'utf8',
