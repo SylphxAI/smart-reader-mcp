@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { execSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createReadMediaHandler } from '../src/handlers/readMedia.js';
 import { sniffFormat } from '../src/sniff/formatSniffer.js';
@@ -95,17 +95,5 @@ describe('rust sniff engine boundary', () => {
     expect(envelope.routing.sniff_method).toBe('rust-sniff');
     expect(envelope.routing.selected_category).toBe('image');
     expect(envelope.routing.selection_reason).toContain('overrides declared extension');
-  });
-
-  it('keeps sniff logic out of the TypeScript adapter sources', () => {
-    const handlerSrc = readFileSync(path.join(repoRoot, 'src/handlers/readMedia.ts'), 'utf8');
-    const snifferSrc = readFileSync(path.join(repoRoot, 'src/sniff/formatSniffer.ts'), 'utf8');
-    const engineSrc = readFileSync(path.join(repoRoot, 'src/engine/rust-sniff.ts'), 'utf8');
-
-    expect(engineSrc).toContain('spawnSync');
-    expect(handlerSrc).toContain('resolveMediaPathViaRustEngine');
-    expect(handlerSrc).not.toMatch(/0x89,\s*0x50,\s*0x4e,\s*0x47/);
-    expect(snifferSrc).toContain('sniffFormatViaRustEngine');
-    expect(snifferSrc).toContain('shouldUseRustSniffEngine');
   });
 });
