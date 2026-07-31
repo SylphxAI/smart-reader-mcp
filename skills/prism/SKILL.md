@@ -35,4 +35,3 @@ Live e2e: `test/prism-delegate-*.e2e.test.ts` (skip when sibling native missing)
 
 Evidence envelope includes routing decision + sibling tool result. No `evidence_first` tool.
 
-Family: https://github.com/SylphxAI/instruments

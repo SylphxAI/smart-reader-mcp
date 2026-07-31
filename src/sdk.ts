@@ -1,5 +1,5 @@
 /**
- * Prism SDK — local media router (Sylphx Instruments).
+ * Prism SDK — local media router (Sylphx).
  * Isomorphic with MCP tool `read_media`: sniff format → delegate to Citra/Iris/Cue.
  */
 import { readMedia } from './handlers/readMedia.js';

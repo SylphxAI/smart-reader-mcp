@@ -2,7 +2,7 @@
 
 # Prism
 
-### One beam in. Right instrument out. *(Sylphx Instruments)*
+### One beam in. Right instrument out. 
 
 **Prism** (transitional package `@sylphx/smart-reader-mcp`) — sniff + route local media to Citra / Iris / Cue.
 
@@ -111,28 +111,9 @@ Supported formats:
 - Image: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.tif`, `.tiff`
 - Video: `.mp4`, `.m4v`, `.mkv`, `.mov`, `.webm`
 
-## Sylphx Instruments (media lane)
+## Product independence
 
-**Prism** owns media sniff + stdio dispatch only. Company product-family knowledge
-lives in docs-only [SylphxAI/instruments](https://github.com/SylphxAI/instruments)
-— not a monorepo and not imported as a package. Sibling instruments are independent
-repositories (marketplace + stars). Format-specific repos own their parsers.
-
-Product-local dispatch ADR still lives **here**.
-
-| Repository | Package | Role |
-| --- | --- | --- |
-| [pdf-reader-mcp](https://github.com/SylphxAI/pdf-reader-mcp) | `@sylphx/pdf-reader-mcp` | PDF (production; independent project) |
-| [image-reader-mcp](https://github.com/SylphxAI/image-reader-mcp) | `@sylphx/image-reader-mcp` | Image read |
-| [video-reader-mcp](https://github.com/SylphxAI/video-reader-mcp) | `@sylphx/video-reader-mcp` | Video read |
-| **smart-reader-mcp** (this repo) | `@sylphx/smart-reader-mcp` | Sniff + delegate + unified `read_media` |
-
-Full decision record: [ADR-0002: Reader Portfolio Architecture](docs/adr/0002-reader-portfolio-architecture.md).
-
-### Read vs interpret
-
-- **Read:** metadata, OCR, subtitles, scenes, transcripts — deterministic, no generative LLM default.
-- **Interpret:** summarization / VQA — agent or optional remote provider; out of scope for Reader MCP packages.
+This repository is product SSOT for Prism. Sibling readers (PDF/image/video) are separate repositories; composition is via public contracts only — not a monorepo.
 
 ## MCP Tool Surface
 
