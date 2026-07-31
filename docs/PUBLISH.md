@@ -3,28 +3,14 @@
 | Field | Value |
 | --- | --- |
 | Package | `@sylphx/smart-reader-mcp` |
-| Repo version | `0.2.1` |
+| Version | `0.2.2` |
 | Registry state | **published** |
-| npm auth in this environment | `ENEEDAUTH` (cannot live-publish here) |
+| Auth path | GitHub org secret `NPM_TOKEN` via `publish-npm-package.yml` |
 
-## Install paths
-
-### npm (when published)
+## Install
 
 ```bash
 npm i -g @sylphx/smart-reader-mcp
 ```
 
-### Git (always available; product SSOT)
-
-```bash
-git clone https://github.com/SylphxAI/smart-reader-mcp.git
-cd smart-reader-mcp
-bun install
-```
-
-### Residual
-
-Live `npm publish` for unpublished packages requires `@sylphx` automation token / 2FA on a trusted publisher machine. That is an **external credential blocker**, not a product design gap.
-
-See also [BRAND_PUBLISH.md](./BRAND_PUBLISH.md) when present.
+Git SSOT remains the product repository for source/release train.
