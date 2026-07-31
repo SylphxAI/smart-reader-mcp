@@ -114,9 +114,16 @@ test('launches shell sibling bins without node when package is resolvable', () =
   // When a sibling package is installed, bin may be a shell launcher (not .js).
   // resolveReaderLaunchSpec must not force process.execPath for those paths.
   const launch = resolveReaderLaunchSpec(READER_DELEGATION.image);
-  // Either npx fallback or local non-node command is acceptable.
+  expect(launch).toBeTruthy();
   if (launch?.source === 'local') {
-    expect(launch.command).not.toBe(process.execPath);
+    if (launch.args.length === 0) {
+      // Shell/native launcher path: execute the bin directly.
+      expect(launch.command).not.toBe(process.execPath);
+    } else {
+      // JS module entry: runtime is node/bun with the module path as argv0.
+      expect(launch.command).toBe(process.execPath);
+      expect(launch.args[0]).toMatch(/\.(m?js|cjs|ts)$/i);
+    }
   } else {
     expect(launch?.command).toBe('npx');
   }
