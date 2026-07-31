@@ -21,7 +21,7 @@ trust — no manual format routing required.
 [![CI/CD](https://img.shields.io/github/actions/workflow/status/SylphxAI/smart-reader-mcp/ci.yml?style=flat-square&label=CI/CD)](https://github.com/SylphxAI/smart-reader-mcp/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
 
-**Local-first** · **One smart `read_media` call** · **Delegation provenance envelope** · **33 tests**
+**Local-first** · **One smart `read_media` call** · **Delegation provenance envelope** · **50+ tests**
 
 SOTA family roadmap: [docs/roadmap/sota-family-roadmap.md](docs/roadmap/sota-family-roadmap.md).
 
@@ -54,15 +54,27 @@ sniffs format and delegates with proof.**
 | Opaque passthrough results | Normalized envelope: `source_path`, `detected_format`, `delegated_tool`, `raw_result` |
 | Re-implemented parsers in one repo | Delegates to `@sylphx/pdf-reader-mcp`, `@sylphx/image-reader-mcp`, `@sylphx/video-reader-mcp` |
 | Cloud routing services | **Local-first** stdio delegation to sibling packages |
-| Ship and pray | **33** tests on sniffing, mislabeled routing, doctor, release gate, and delegation |
+| Ship and pray | **50+** tests on sniffing, mislabeled routing, doctor, release gate, and delegation |
 
 ## See it work
 
 **Install once. Call once.**
 
 ```bash
+npm install -g @sylphx/smart-reader-mcp
+prism doctor
+# brand bin + MCP
 claude mcp add smart-reader -- npx @sylphx/smart-reader-mcp
 ```
+
+### Install (30 seconds)
+
+| Surface | Command |
+| --- | --- |
+| npm global | `npm i -g @sylphx/smart-reader-mcp` |
+| brand bin | `prism` |
+| MCP | `npx @sylphx/smart-reader-mcp` |
+
 
 ```json
 {
