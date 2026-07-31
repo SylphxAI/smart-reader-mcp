@@ -99,10 +99,14 @@ Supported formats:
 - Image: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.tif`, `.tiff`
 - Video: `.mp4`, `.m4v`, `.mkv`, `.mov`, `.webm`
 
-## Sylphx Reader portfolio
+## Sylphx Instruments (media lane)
 
-Portfolio architecture lives **here** — this repo owns dispatch and the unified
-read tool. Format-specific repos own their own parsers and boundary ADRs.
+**Prism** owns media sniff + stdio dispatch only. Company product-family knowledge
+lives in docs-only [SylphxAI/instruments](https://github.com/SylphxAI/instruments)
+— not a monorepo and not imported as a package. Sibling instruments are independent
+repositories (marketplace + stars). Format-specific repos own their parsers.
+
+Product-local dispatch ADR still lives **here**.
 
 | Repository | Package | Role |
 | --- | --- | --- |
