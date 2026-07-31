@@ -275,6 +275,13 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     addCheck(checks, 'rust:mcp_server_crate', false, `smart-reader-mcp-server build failed: ${message}`);
   }
 
+  addCheck(
+    checks,
+    'surface:agent_skill',
+    fileExists('skills/prism/SKILL.md'),
+    'Agent skill surface is present at skills/prism/SKILL.md'
+  );
+
   const passed = checks.filter((check) => check.status === 'passed').length;
   const failed = checks.length - passed;
 
