@@ -39,6 +39,7 @@ const report = {
   ms,
   results,
   hasSkill: existsSync(join(root, 'skills/prism/SKILL.md')),
+  brandPublishDoc: existsSync(join(root, 'docs/BRAND_PUBLISH.md')),
   ok: results.every((r) => r.ok),
   generatedAt: new Date().toISOString(),
 };
