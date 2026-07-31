@@ -60,6 +60,7 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     version: string;
     bin?: Record<string, string>;
     dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
   };
   const manifest = readJson('test/fixtures/corpus-manifest.json') as {
     profile: string;

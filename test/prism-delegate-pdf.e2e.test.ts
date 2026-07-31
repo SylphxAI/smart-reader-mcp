@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { delegateToReader } from '../src/delegate/delegateToReader.ts';
-import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
+import { delegateToReader } from '../src/delegate/delegateToReader.js';
+import { createReadMediaHandler } from '../src/handlers/readMedia.js';
 
 const pdfServerCandidates = [
   join(import.meta.dir, '../../pdf-reader-mcp/bin/native/pdf-reader-mcp-server'),
@@ -28,10 +28,10 @@ describe('Prism → Citra delegation e2e', () => {
     async () => {
       process.env.PDF_READER_MCP_RUST_BIN = pdfServer!;
       const readMedia = createReadMediaHandler({
-        delegateToReader: (options) =>
+        delegateToReader: (options: any) =>
           delegateToReader({
             ...options,
-            resolveLaunchSpec: (config) => ({
+            resolveLaunchSpec: (config: any) => ({
               command: pdfServer!,
               args: [],
               source: 'local',

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { delegateToReader } from '../src/delegate/delegateToReader.ts';
-import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
+import { delegateToReader } from '../src/delegate/delegateToReader.js';
+import { createReadMediaHandler } from '../src/handlers/readMedia.js';
 
 const imageServer = join(
   import.meta.dir,
@@ -26,10 +26,10 @@ describe('Prism → Iris delegation e2e', () => {
     async () => {
       process.env.IMAGE_READER_MCP_RUST_BIN = imageServer;
       const readMedia = createReadMediaHandler({
-        delegateToReader: (options) =>
+        delegateToReader: (options: any) =>
           delegateToReader({
             ...options,
-            resolveLaunchSpec: (config) => ({
+            resolveLaunchSpec: (config: any) => ({
               command: imageServer,
               args: [],
               source: 'local',

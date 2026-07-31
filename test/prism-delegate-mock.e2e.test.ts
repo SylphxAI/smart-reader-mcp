@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { join } from 'node:path';
-import { delegateToReader } from '../src/delegate/delegateToReader.ts';
-import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
+import { delegateToReader } from '../src/delegate/delegateToReader.js';
+import { createReadMediaHandler } from '../src/handlers/readMedia.js';
 
 const samplePdf = join(import.meta.dir, 'fixtures/sample.pdf');
 const samplePng = join(import.meta.dir, 'fixtures/sample.png');
@@ -19,16 +19,16 @@ function extractText(result: unknown): string | undefined {
 describe('Prism → mock sibling envelope e2e', () => {
   test('PDF path builds Citra-shaped envelope via mocked delegation', async () => {
     const readMedia = createReadMediaHandler({
-      delegateToReader: (options) =>
+      delegateToReader: (options: any) =>
         delegateToReader({
           ...options,
-          resolveLaunchSpec: (config) => ({
+          resolveLaunchSpec: (config: any) => ({
             command: 'mock-reader',
             args: [],
             source: 'local',
             packageName: config.packageName,
           }),
-          callTool: async ({ toolName, toolArgs }) => ({
+          callTool: async ({ toolName, toolArgs }: any) => ({
             type: 'text',
             text: JSON.stringify({
               mock: true,
@@ -71,16 +71,16 @@ describe('Prism → mock sibling envelope e2e', () => {
     ] as const;
     for (const c of cases) {
       const readMedia = createReadMediaHandler({
-        delegateToReader: (options) =>
+        delegateToReader: (options: any) =>
           delegateToReader({
             ...options,
-            resolveLaunchSpec: (config) => ({
+            resolveLaunchSpec: (config: any) => ({
               command: 'mock-reader',
               args: [],
               source: 'local',
               packageName: config.packageName,
             }),
-            callTool: async ({ toolName }) => ({
+            callTool: async ({ toolName }: any) => ({
               type: 'text',
               text: JSON.stringify({ mock: true, tool: toolName }),
             }),

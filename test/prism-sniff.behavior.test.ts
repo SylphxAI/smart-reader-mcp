@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { sniffFormatFromBuffer } from '../src/sniff/formatSniffer.ts';
+import { sniffFormatFromBuffer } from '../src/sniff/formatSniffer.js';
 
 describe('Prism sniff behavior (magic bytes)', () => {
   test('detects PDF regardless of extension', () => {
