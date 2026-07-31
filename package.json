@@ -9,7 +9,8 @@
   },
   "license": "MIT",
   "bin": {
-    "smart-reader-mcp": "./bin/smart-reader-mcp"
+    "smart-reader-mcp": "./bin/smart-reader-mcp",
+    "prism": "./bin/smart-reader-mcp"
   },
   "files": [
     "bin/",
