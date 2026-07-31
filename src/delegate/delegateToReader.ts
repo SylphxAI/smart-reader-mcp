@@ -98,17 +98,39 @@ export const buildNpxPackageSpecifier = (packageName: string): string => {
   return pinnedVersion ? `${packageName}@${pinnedVersion}` : packageName;
 };
 
+const isJavaScriptModule = (entryPath: string): boolean => {
+  const lower = entryPath.toLowerCase();
+  return lower.endsWith('.js') || lower.endsWith('.mjs') || lower.endsWith('.cjs') || lower.endsWith('.ts');
+};
+
+const resolveLocalLaunch = (
+  entryPath: string,
+  config: ReaderDelegationConfig
+): ReaderLaunchSpec => {
+  // Sibling readers ship shell launchers that resolve native rmcp binaries.
+  // Spawning those under `node` fails closed with "Connection closed".
+  if (isJavaScriptModule(entryPath)) {
+    return {
+      command: process.execPath,
+      args: [entryPath],
+      source: 'local',
+      packageName: config.packageName,
+    };
+  }
+  return {
+    command: entryPath,
+    args: [],
+    source: 'local',
+    packageName: config.packageName,
+  };
+};
+
 export const resolveReaderLaunchSpec = (
   config: ReaderDelegationConfig
 ): ReaderLaunchSpec | null => {
   const localEntry = resolvePackageEntry(config.packageName, config.binName);
   if (localEntry) {
-    return {
-      command: process.execPath,
-      args: [localEntry],
-      source: 'local',
-      packageName: config.packageName,
-    };
+    return resolveLocalLaunch(localEntry, config);
   }
 
   return {
