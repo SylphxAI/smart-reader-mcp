@@ -1,16 +1,20 @@
-# Publish status
+# Publish status — Prism
 
 | Field | Value |
 | --- | --- |
-| Package | `@sylphx/smart-reader-mcp` |
+| Transitional npm | `@sylphx/smart-reader-mcp` |
+| Brand npm | `@sylphx/prism` |
 | Version | `0.2.2` |
-| Registry state | **published** |
-| Auth path | GitHub org secret `NPM_TOKEN` via `publish-npm-package.yml` |
+| Registry | **live** (dual expand–contract where brand ≠ transitional) |
+| Auth | GitHub org `NPM_TOKEN` via publish workflows |
 
 ## Install
 
 ```bash
+# preferred brand
+npm i -g @sylphx/prism
+# transitional still valid during expand
 npm i -g @sylphx/smart-reader-mcp
 ```
 
-Git SSOT remains the product repository for source/release train.
+Workflows: `publish-npm-package.yml`, `publish-brand-alias.yml`.
