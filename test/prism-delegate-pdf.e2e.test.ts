@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
 import { delegateToReader } from '../src/delegate/delegateToReader.ts';
+import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
 
 const pdfServerCandidates = [
   join(import.meta.dir, '../../pdf-reader-mcp/bin/native/pdf-reader-mcp-server'),
@@ -56,6 +56,6 @@ describe('Prism → Citra delegation e2e', () => {
       const s = JSON.stringify(envelope);
       expect(s.length).toBeGreaterThan(100);
     },
-    120_000,
+    120_000
   );
 });

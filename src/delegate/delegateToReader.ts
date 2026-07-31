@@ -100,7 +100,12 @@ export const buildNpxPackageSpecifier = (packageName: string): string => {
 
 const isJavaScriptModule = (entryPath: string): boolean => {
   const lower = entryPath.toLowerCase();
-  return lower.endsWith('.js') || lower.endsWith('.mjs') || lower.endsWith('.cjs') || lower.endsWith('.ts');
+  return (
+    lower.endsWith('.js') ||
+    lower.endsWith('.mjs') ||
+    lower.endsWith('.cjs') ||
+    lower.endsWith('.ts')
+  );
 };
 
 const resolveLocalLaunch = (

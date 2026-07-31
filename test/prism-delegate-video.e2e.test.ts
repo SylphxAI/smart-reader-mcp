@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'bun:test';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
 import { delegateToReader } from '../src/delegate/delegateToReader.ts';
+import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
 
 const videoServer = join(
   import.meta.dir,
-  '../../video-reader-mcp/target/debug/video-reader-mcp-server',
+  '../../video-reader-mcp/target/debug/video-reader-mcp-server'
 );
 const mp4 = join(import.meta.dir, '../../video-reader-mcp/test/fixtures/no-subtitle.mp4');
 
@@ -54,6 +54,6 @@ describe('Prism → Cue delegation e2e', () => {
       const s = JSON.stringify(envelope);
       expect(s).toMatch(/duration|streams|format/i);
     },
-    120_000,
+    120_000
   );
 });

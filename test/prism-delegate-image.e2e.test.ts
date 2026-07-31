@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'bun:test';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
 import { delegateToReader } from '../src/delegate/delegateToReader.ts';
+import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
 
 const imageServer = join(
   import.meta.dir,
-  '../../image-reader-mcp/target/debug/image-reader-mcp-server',
+  '../../image-reader-mcp/target/debug/image-reader-mcp-server'
 );
 const png = join(import.meta.dir, '../../image-reader-mcp/test/fixtures/sample.png');
 
@@ -60,6 +60,6 @@ describe('Prism → Iris delegation e2e', () => {
       const s = JSON.stringify(envelope);
       expect(s).toMatch(/dimensions|width|height/i);
     },
-    90_000,
+    90_000
   );
 });

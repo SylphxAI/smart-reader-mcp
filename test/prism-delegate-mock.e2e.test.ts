@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { join } from 'node:path';
-import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
 import { delegateToReader } from '../src/delegate/delegateToReader.ts';
+import { createReadMediaHandler } from '../src/handlers/readMedia.ts';
 
 const samplePdf = join(import.meta.dir, 'fixtures/sample.pdf');
 const samplePng = join(import.meta.dir, 'fixtures/sample.png');
@@ -56,8 +56,18 @@ describe('Prism → mock sibling envelope e2e', () => {
 
   test('image and video map to Iris/Cue tools under mock', async () => {
     const cases = [
-      { path: samplePng, formatIncludes: 'image', tool: 'read_image', pkg: '@sylphx/image-reader-mcp' },
-      { path: sampleMp4, formatIncludes: 'video', tool: 'read_video', pkg: '@sylphx/video-reader-mcp' },
+      {
+        path: samplePng,
+        formatIncludes: 'image',
+        tool: 'read_image',
+        pkg: '@sylphx/image-reader-mcp',
+      },
+      {
+        path: sampleMp4,
+        formatIncludes: 'video',
+        tool: 'read_video',
+        pkg: '@sylphx/video-reader-mcp',
+      },
     ] as const;
     for (const c of cases) {
       const readMedia = createReadMediaHandler({
