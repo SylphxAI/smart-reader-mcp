@@ -282,6 +282,20 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     'Agent skill surface is present at skills/prism/SKILL.md'
   );
 
+  addCheck(
+    checks,
+    'surface:public_proof_script',
+    fileExists('scripts/public-proof.ts'),
+    'Public proof script is present'
+  );
+
+  addCheck(
+    checks,
+    'docs:brand_publish',
+    fileExists('docs/BRAND_PUBLISH.md'),
+    'Brand publish readiness doc is present'
+  );
+
   const passed = checks.filter((check) => check.status === 'passed').length;
   const failed = checks.length - passed;
 
