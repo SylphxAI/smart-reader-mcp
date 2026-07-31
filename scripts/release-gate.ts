@@ -73,6 +73,32 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     'package.json exposes the smart-reader-mcp bin entry',
     { bin: pkg.bin?.['smart-reader-mcp'] }
   );
+  addCheck(
+    checks,
+    'package:prism_brand_bin',
+    typeof pkg.bin?.prism === 'string',
+    'package.json exposes brand bin prism',
+    { bin: pkg.bin?.prism }
+  );
+
+  const serverJson = fileExists('server.json')
+    ? (readJson('server.json') as { title?: string })
+    : null;
+  addCheck(
+    checks,
+    'marketplace:server_json_title_prism',
+    serverJson?.title === 'Prism',
+    'server.json marketplace title is Prism',
+    { title: serverJson?.title }
+  );
+
+  addCheck(
+    checks,
+    'sdk:prism_source',
+    fileExists('src/sdk.ts'),
+    'Prism SDK source is present at src/sdk.ts'
+  );
+
 
   addCheck(
     checks,
