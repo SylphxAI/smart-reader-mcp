@@ -1,6 +1,10 @@
 <div align="center">
 
-# 🧠 Smart Reader MCP
+# Prism
+
+### One beam in. Right instrument out. *(Sylphx Instruments)*
+
+**Prism** (transitional package `@sylphx/smart-reader-mcp`) — sniff + route local media to Citra / Iris / Cue.
 
 <p align="center">
   <img src="https://mark.sylphx.com/api/v1/banner?type=liquid&theme=tokyonight&text=smart+reader+mcp&desc=One+MCP+call+reads+PDF%2C+image%2C+or+video+by+sniffing+format+and+delegating+to+Syl&height=200&animation=rise&credit=0" alt="smart-reader-mcp — Sylphx Mark banner" width="100%" />
@@ -8,7 +12,7 @@
 
 ### Your agent found a file. **Did it pick the right reader?**
 
-One MCP call reads PDF, image, or video. Smart Reader sniffs format, delegates to
+One MCP call reads PDF, image, or video. **Prism** sniffs format, delegates to
 the matching Sylphx Reader sibling, and returns a **provenance envelope** you can
 trust — no manual format routing required.
 
