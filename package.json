@@ -69,7 +69,6 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@sylphx/reader-evidence": "github:SylphxAI/reader-evidence",
     "zod": "^4.4.3"
   },
   "optionalDependencies": {

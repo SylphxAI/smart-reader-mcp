@@ -19,4 +19,4 @@ processing). Generative LLMs are optional remote providers only, never the defau
 ## Consequences
 
 - Implement `read_media` with provenance and release gates before v0.1.0.
-- Depend on `@sylphx/reader-evidence` for shared schema when types stabilize.
+- Keep evidence contracts product-local. Do not depend on archived `@sylphx/reader-evidence` or any family control package.
