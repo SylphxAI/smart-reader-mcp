@@ -2,18 +2,18 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.SylphxAI/smart-reader-mcp",
   "title": "Prism",
-  "description": "Prism \u2014 sniff local media and route to Citra/Iris/Cue with provenance. SDK \u00b7 CLI \u00b7 MCP. by Sylphx.",
+  "description": "Prism — sniff local media and route to Citra/Iris/Cue with provenance. SDK · CLI · MCP. by Sylphx.",
   "repository": {
     "url": "https://github.com/SylphxAI/smart-reader-mcp",
     "source": "github"
   },
-  "version": "0.2.2",
+  "version": "0.2.3",
   "websiteUrl": "https://github.com/SylphxAI/smart-reader-mcp#readme",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@sylphx/smart-reader-mcp",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "transport": {
         "type": "stdio"
       }
