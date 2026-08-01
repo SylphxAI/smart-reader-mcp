@@ -2,8 +2,7 @@ name: CI
 
 # Fast Trunk (Agent-native):
 # - Aggregate source verdict: source-ci/pass
-# - CI = source correctness only; Platform builds production once
-# - Merge Queue off by default (no merge_group trigger)
+# - CI = source correctness only
 # - Concurrency cancels superseded PR/branch tip runs
 
 on:
@@ -13,18 +12,18 @@ on:
   pull_request:
     branches: [main]
 
-
 concurrency:
-  # Fast Trunk: supersede obsolete runs for the same PR or branch tip.
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   validate:
     name: Validate
-    runs-on: ubuntu-latest
+    runs-on: sylphx-linux-standard
     steps:
       - uses: actions/checkout@v7.0.0
+      - name: Enforce owned CI runner profiles
+        run: python3 .github/scripts/check-owned-runner-profiles.py
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.12'

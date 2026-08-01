@@ -1,149 +1,74 @@
-name: Native multi-arch
+name: Native build (legacy path)
+
+# Prefer native-multiarch.yml for production multi-arch natives.
+# This workflow remains dispatch-only with static owned runners for ad-hoc single builds.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'crates/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'bin/smart-reader-mcp'
-      - 'npm/**'
-      - 'scripts/stage-rust-mcp.ts'
-      - 'scripts/assemble-multiarch-natives.ts'
-      - '.github/workflows/native-build.yml'
-      - '.github/workflows/release.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'crates/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'bin/smart-reader-mcp'
-      - 'npm/**'
-      - 'scripts/stage-rust-mcp.ts'
-      - 'scripts/assemble-multiarch-natives.ts'
-      - '.github/workflows/native-build.yml'
-      - '.github/workflows/release.yml'
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.ref_name != 'main' }}
+permissions:
+  contents: read
 
 jobs:
-  build:
+  build-linux-x64:
+    runs-on: sylphx-linux-standard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-gnu
+      - name: Build
+        run: |
+          set -euo pipefail
+          cargo build --release -p smart-reader-mcp-server --target x86_64-unknown-linux-gnu
+          test -f target/x86_64-unknown-linux-gnu/release/smart-reader-mcp-server
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-linux-x64-gnu
+          path: target/x86_64-unknown-linux-gnu/release/smart-reader-mcp-server
+
+  build-linux-arm64:
+    runs-on: sylphx-linux-standard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-unknown-linux-gnu
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.1
+      - name: Build via zig
+        run: |
+          set -euo pipefail
+          cargo install cargo-zigbuild --version 0.23.0 --locked
+          cargo zigbuild --release -p smart-reader-mcp-server --target aarch64-unknown-linux-gnu.2.17
+          test -f target/aarch64-unknown-linux-gnu/release/smart-reader-mcp-server
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-linux-arm64-gnu
+          path: target/aarch64-unknown-linux-gnu/release/smart-reader-mcp-server
+
+  build-darwin:
+    runs-on: [self-hosted, sylphx, macos, standard]
     strategy:
       fail-fast: false
       matrix:
-        settings:
-          # Product Darwin: Sylphx self-hosted only (no GitHub-hosted macos-*).
-          # QEMU amd64 fleet: x86_64 native; aarch64 cross-compiled on same host.
-          
-          - host: [self-hosted, sylphx, macos, standard]
-            target: aarch64-apple-darwin
-            platform_key: darwin-arm64
-          - host: [self-hosted, sylphx, macos, standard]
-            target: x86_64-apple-darwin
-            platform_key: darwin-x64
-          - host: ubuntu-24.04
-            target: x86_64-unknown-linux-gnu
-            platform_key: linux-x64-gnu
-          - host: ubuntu-24.04-arm
-            target: aarch64-unknown-linux-gnu
-            platform_key: linux-arm64-gnu
-
-    name: Build ${{ matrix.settings.target }}
-    runs-on: ${{ matrix.settings.host }}
-
+        include:
+          - target: aarch64-apple-darwin
+            key: darwin-arm64
+          - target: x86_64-apple-darwin
+            key: darwin-x64
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.settings.target }}
-
-      - name: Cache cargo
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: native-${{ matrix.settings.target }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            native-${{ matrix.settings.target }}-
-
-      - name: Build release natives
+          targets: ${{ matrix.target }}
+      - name: Build
         run: |
           set -euo pipefail
-          cargo build --release -p smart-reader-mcp-server --target ${{ matrix.settings.target }}
-          BIN="target/${{ matrix.settings.target }}/release/smart-reader-mcp-server"
-          test -f "$BIN"
-          chmod +x "$BIN"
-          file "$BIN" || true
-          # Fail-closed: binary must be non-trivial
-          test "$(wc -c < "$BIN")" -gt 100000
-          mkdir -p "native-out"
-          cp "$BIN" "native-out/smart-reader-mcp-server"
-          chmod +x "native-out/smart-reader-mcp-server"
-
-      - name: Upload native artifact
-        uses: actions/upload-artifact@v4
+          cargo build --release -p smart-reader-mcp-server --target ${{ matrix.target }}
+          test -f target/${{ matrix.target }}/release/smart-reader-mcp-server
+      - uses: actions/upload-artifact@v4
         with:
-          name: smart-reader-mcp-native-${{ matrix.settings.target }}
-          path: native-out/smart-reader-mcp-server
-          if-no-files-found: error
-          retention-days: 14
-
-  assemble-check:
-    name: Assemble multi-arch packages
-    needs: build
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.12
-
-      - name: Download all native artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-          pattern: smart-reader-mcp-native-*
-
-      - name: Assemble platform packages (fail-closed)
-        run: bun scripts/assemble-multiarch-natives.ts
-
-      - name: List assembled packages
-        run: |
-          set -euo pipefail
-          for dir in npm/*/; do
-            echo "== $dir =="
-            ls -la "$dir"
-            test -x "${dir}smart-reader-mcp-server"
-            file "${dir}smart-reader-mcp-server" || true
-          done
-
-      - name: Arch-aware wrapper smoke (host linux x64)
-        run: |
-          set -euo pipefail
-          chmod +x bin/smart-reader-mcp
-          # Stage host binary into bin/native from linux-x64 package for local path smoke
-          mkdir -p bin/native
-          cp npm/linux-x64-gnu/smart-reader-mcp-server bin/native/
-          chmod +x bin/native/smart-reader-mcp-server
-          out="$(timeout 5s bin/smart-reader-mcp doctor 2>&1 || true)"
-          echo "$out"
-          # Ensure we did not print "not built" / missing-native path when binary is present
-          if echo "$out" | grep -qiE 'is not built|No runnable Rust MCP server'; then
-            echo "FAIL: missing-native path detected despite staged binary"
-            exit 1
-          fi
-          echo "$out" | grep -E 'smart-reader-mcp Rust MCP server' >/dev/null
-          test -x npm/linux-x64-gnu/smart-reader-mcp-server
-          timeout 5s npm/linux-x64-gnu/smart-reader-mcp-server doctor >/dev/null
-          echo "PASS: multi-arch assemble + wrapper smoke"
+          name: native-${{ matrix.key }}
+          path: target/${{ matrix.target }}/release/smart-reader-mcp-server
