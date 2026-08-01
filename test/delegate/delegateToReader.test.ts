@@ -18,9 +18,7 @@ describe('resolveReaderLaunchSpec', () => {
   });
 
   test('pins npx fallback to optionalDependency versions for known siblings', () => {
-    expect(buildNpxPackageSpecifier('@sylphx/pdf-reader-mcp')).toBe(
-      '@sylphx/pdf-reader-mcp@4.1.2'
-    );
+    expect(buildNpxPackageSpecifier('@sylphx/pdf-reader-mcp')).toBe('@sylphx/pdf-reader-mcp@4.1.2');
     expect(buildNpxPackageSpecifier('@sylphx/image-reader-mcp')).toBe(
       '@sylphx/image-reader-mcp@0.1.7'
     );
