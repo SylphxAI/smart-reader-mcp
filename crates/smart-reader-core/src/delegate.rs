@@ -21,19 +21,19 @@ pub fn reader_config(category: MediaCategory) -> Option<ReaderConfig> {
         MediaCategory::Pdf => Some(ReaderConfig {
             package_name: "@sylphx/pdf-reader-mcp",
             tool_name: "read_pdf",
-            contract_version: "3.0.14",
+            contract_version: "4.1.2",
             cli_env_var: "SMART_READER_PDF_CLI",
         }),
         MediaCategory::Image => Some(ReaderConfig {
             package_name: "@sylphx/image-reader-mcp",
             tool_name: "read_image",
-            contract_version: "0.1.0",
+            contract_version: "0.1.7",
             cli_env_var: "SMART_READER_IMAGE_CLI",
         }),
         MediaCategory::Video => Some(ReaderConfig {
             package_name: "@sylphx/video-reader-mcp",
             tool_name: "read_video",
-            contract_version: "0.1.0",
+            contract_version: "0.1.7",
             cli_env_var: "SMART_READER_VIDEO_CLI",
         }),
         MediaCategory::Unknown => None,

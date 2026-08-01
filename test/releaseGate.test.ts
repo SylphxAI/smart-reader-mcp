@@ -9,6 +9,10 @@ describe('smart reader release gate', () => {
     );
 
     expect(report.profile).toBe('smart_reader_release_gate');
+    const failed = report.checks.filter((c) => c.status === 'failed');
+    if (failed.length) {
+      console.error(JSON.stringify(failed, null, 2));
+    }
     expect(report.status).toBe('passed');
     expect(report.summary.failed).toBe(0);
     expect(report.checks.some((check) => check.id === 'fixtures:corpus_manifest')).toBe(true);
