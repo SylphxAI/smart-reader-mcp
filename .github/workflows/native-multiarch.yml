@@ -55,15 +55,7 @@ jobs:
           set -euo pipefail
           target="${{ matrix.target }}"
           if [[ "${{ matrix.zig }}" == "1" ]]; then
-            if ! command -v cargo-zigbuild >/dev/null 2>&1; then
-              cargo install cargo-zigbuild --locked || true
-            fi
-            if command -v cargo-zigbuild >/dev/null 2>&1 && command -v zig >/dev/null 2>&1; then
-              cargo zigbuild --release -p smart-reader-mcp-server --target "${target}.2.17" || cargo build --release -p smart-reader-mcp-server --target "$target"
-            else
-              # fallback: only works on matching host arch
-              cargo build --release -p smart-reader-mcp-server --target "$target"
-            fi
+            cargo zigbuild --release -p smart-reader-mcp-server --target "${target}.2.17"
           else
             cargo build --release -p smart-reader-mcp-server --target "$target"
           fi
@@ -87,7 +79,7 @@ jobs:
 
   publish:
     needs: build
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && !cancelled() && needs.build.result != 'cancelled'
     runs-on: sylphx-linux-standard
     steps:
       - uses: actions/checkout@v4
