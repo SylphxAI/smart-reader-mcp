@@ -1,6 +1,6 @@
 {
   "name": "@sylphx/smart-reader-mcp-linux-x64-gnu",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Smart Reader MCP server native binary for linux-x64-gnu",
   "os": [
     "linux"

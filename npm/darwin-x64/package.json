@@ -1,6 +1,6 @@
 {
   "name": "@sylphx/smart-reader-mcp-darwin-x64",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Smart Reader MCP server native binary for darwin-x64",
   "os": [
     "darwin"
