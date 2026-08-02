@@ -2,9 +2,18 @@
   "subject": "/absolute/path/to/report.pdf",
   "source": "/absolute/path/to/report.pdf",
   "sourceHash": "sha256-example",
-  "freshness": { "indexedAt": "2026-07-09T00:00:00.000Z", "stale": false },
-  "locator": { "path": "/absolute/path/to/report.pdf", "detectedFormat": "pdf" },
-  "route": { "sniff": "magic-bytes-v1", "delegation": "read_pdf" },
+  "freshness": {
+    "indexedAt": "2026-07-09T00:00:00.000Z",
+    "stale": false
+  },
+  "locator": {
+    "path": "/absolute/path/to/report.pdf",
+    "detectedFormat": "pdf"
+  },
+  "route": {
+    "sniff": "magic-bytes-v1",
+    "delegation": "read_pdf"
+  },
   "confidence": "deterministic",
   "warnings": [],
   "nextActions": [
@@ -30,7 +39,7 @@
         "category": "image",
         "delegated_tool": "read_image",
         "reader_package": "@sylphx/image-reader-mcp",
-        "reader_contract_version": "0.1.7",
+        "reader_contract_version": "0.1.8",
         "reason": "Not selected: detected format pdf does not map to image."
       },
       {

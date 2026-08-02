@@ -1,11 +1,21 @@
 {
   "name": "@sylphx/smart-reader-mcp-linux-x64-gnu",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Prism native MCP server for linux-x64-gnu",
-  "os": ["linux"],
-  "cpu": ["x64"],
-  "libc":["glibc"],
-  "files": ["smart-reader-mcp-server"],
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "files": [
+    "smart-reader-mcp-server"
+  ],
   "license": "MIT",
-  "publishConfig": {"access": "public"}
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -27,7 +27,7 @@ pub fn reader_config(category: MediaCategory) -> Option<ReaderConfig> {
         MediaCategory::Image => Some(ReaderConfig {
             package_name: "@sylphx/image-reader-mcp",
             tool_name: "read_image",
-            contract_version: "0.1.7",
+            contract_version: "0.1.8",
             cli_env_var: "SMART_READER_IMAGE_CLI",
         }),
         MediaCategory::Video => Some(ReaderConfig {
