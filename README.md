@@ -237,3 +237,7 @@ Know another MCP directory? [Open an issue](https://github.com/SylphxAI/smart-re
 ## License
 
 MIT © [SylphxAI](https://github.com/SylphxAI)
+
+## Compose
+
+[Composition doctrine — SDK, not MCP, for product integration](docs/SDK_MCP_COMPOSITION.md) · `Prism.composeVideo` merges Cue structure + Iris L2 objects via SDK.

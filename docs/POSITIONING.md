@@ -37,3 +37,9 @@ See [COMPETITIVE.md](./COMPETITIVE.md).
 ## Completion bar
 
 See [IPPB.md](./IPPB.md).
+
+
+## Composition doctrine
+
+Products compose via **SDK**; **MCP** is the agent surface; **CLI** for humans.
+Prism's `composeVideo` uses Cue + Iris SDKs (no MCP-to-MCP). [doc](./SDK_MCP_COMPOSITION.md)
