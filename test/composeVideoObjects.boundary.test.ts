@@ -114,3 +114,34 @@ describe('instantiateSdk (class-with-create SDK shape)', () => {
     expect(() => instantiateSdk({ default: {} })).toThrow(/no \.create\(\)/);
   });
 });
+
+describe('SDK MCP-text envelope parsing', () => {
+  test('unpacks {type:text,text:json} result into semantics', async () => {
+    const { createComposeVideoObjects } = await import('../src/compose/composeVideoObjects.js');
+    const fakeCue = {
+      read: async () => ({
+        type: 'text',
+        text: JSON.stringify({
+          result: { scenes: [{ time_ms: 0 }], format: { duration_ms: 1000 } },
+        }),
+      }),
+    };
+    const fakeIris = {
+      read: async () => ({
+        type: 'text',
+        text: JSON.stringify({
+          result: { semantics: { available: true, model: 'm', objects: [{ label: 'person' }] } },
+        }),
+      }),
+    };
+    const compose = createComposeVideoObjects({
+      loadCue: async () => fakeCue as never,
+      loadIris: async () => fakeIris as never,
+      render: async () => {},
+    });
+    const out = await compose({ path: '/v.mp4', limit: 1 });
+    expect(out.keyframes.length).toBeGreaterThan(0);
+    expect(out.keyframes[0]?.objects[0]?.label).toBe('person');
+    expect(out.total_objects).toBeGreaterThan(0);
+  });
+});

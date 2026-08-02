@@ -37,6 +37,26 @@ export interface ComposeVideoDeps {
   sceneThreshold?: number;
 }
 
+function unpackSdkEnvelope(resp: unknown): Record<string, unknown> {
+  if (!resp || typeof resp !== 'object') return {};
+  const r = resp as Record<string, unknown>;
+  if (typeof r['text'] === 'string' && ('type' in r || Object.keys(r).length <= 3)) {
+    try {
+      const parsed = JSON.parse(r['text'] as string);
+      if (parsed && typeof parsed === 'object') {
+        const inner = parsed as Record<string, unknown>;
+        return inner['result'] && typeof inner['result'] === 'object'
+          ? (inner['result'] as Record<string, unknown>)
+          : inner;
+      }
+    } catch {
+      // fall through
+    }
+  }
+  if (r['result'] && typeof r['result'] === 'object') return r['result'] as Record<string, unknown>;
+  return r;
+}
+
 type TimelineEnvelopeRecord = {
   result?: { scenes?: Array<{ time_ms?: number }>; format?: { duration_ms?: number } };
 };
@@ -149,14 +169,17 @@ export const createComposeVideoObjects = (deps: ComposeVideoDeps = {}) => {
     const iris = await loadIris();
 
     // 1. Cue structural timeline (SDK)
-    const cueEnvelope = (await cue.read({
+    const cueResp = (await cue.read({
       path: input.path,
       include_keyframes: true,
       keyframe_policy: 'structural',
-    })) as TimelineEnvelopeRecord;
-    const result = cueEnvelope?.result ?? {};
-    const scenes = Array.isArray(result.scenes) ? result.scenes.map((s) => s.time_ms ?? 0) : [];
-    const durationMs = result.format?.duration_ms;
+    })) as unknown;
+    const result = unpackSdkEnvelope(cueResp);
+    const scenes = Array.isArray(result['scenes'])
+      ? (result['scenes'] as Array<{ time_ms?: number }>).map((s) => s['time_ms'] ?? 0)
+      : [];
+    const format = result['format'] as { duration_ms?: number } | undefined;
+    const durationMs = format?.duration_ms;
 
     // 2. structural keyframe times (mirror of Cue plan; deterministic)
     const times = structuralKeyframeTimes({
@@ -191,20 +214,10 @@ export const createComposeVideoObjects = (deps: ComposeVideoDeps = {}) => {
             ...(input.prompt ? { semantics_prompt: input.prompt } : {}),
             ...(input.semanticsUrl ? { semantics_url: input.semanticsUrl } : {}),
           })) as unknown;
-          const twin =
-            (
-              irisEnvelope as {
-                result?: {
-                  semantics?: {
-                    objects?: unknown[];
-                    caption?: string;
-                    model?: string;
-                    available?: boolean;
-                  };
-                };
-              }
-            )?.result ?? {};
-          const semantics = twin.semantics;
+          const twin = unpackSdkEnvelope(irisEnvelope);
+          const semantics = twin['semantics'] as
+            | { objects?: unknown[]; caption?: string; model?: string; available?: boolean }
+            | undefined;
           const objects: ComposedKeyframeObject[] = (semantics?.objects ??
             []) as ComposedKeyframeObject[];
           const available = semantics?.available ?? objects.length > 0;
