@@ -76,6 +76,23 @@ export function structuralKeyframeTimes(input: {
   return [...new Set(picked)].sort((a, b) => a - b);
 }
 
+export function instantiateSdk(mod: unknown): {
+  read: (input: { path: string; [k: string]: unknown }) => Promise<unknown>;
+} {
+  const Cls = (mod as { default?: unknown }).default ?? mod;
+  const ctor = Cls as {
+    create?: () => { read: (input: { path: string; [k: string]: unknown }) => Promise<unknown> };
+  };
+  if (typeof ctor?.create !== 'function') {
+    throw new Error('SDK module has no .create(); incompatible sibling SDK export');
+  }
+  const instance = ctor.create();
+  if (typeof instance?.read !== 'function') {
+    throw new Error('SDK instance has no .read(); incompatible sibling SDK export');
+  }
+  return { read: (input) => instance.read(input) };
+}
+
 export const createComposeVideoObjects = (deps: ComposeVideoDeps = {}) => {
   const loadCue =
     deps.loadCue ??
@@ -93,7 +110,7 @@ export const createComposeVideoObjects = (deps: ComposeVideoDeps = {}) => {
           'composeVideo requires the Iris SDK. Install it with: npm i @sylphx/iris (or set IRIS_SEMANTICS_URL for a sidecar).'
         );
       });
-      return (mod.default ?? mod) as unknown as IrisSdkLike;
+      return instantiateSdk(mod) as unknown as IrisSdkLike;
     });
   const render =
     deps.render ??

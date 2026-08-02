@@ -92,3 +92,25 @@ describe('Prism composeVideo SDK load failure (honest degrade)', () => {
     await expect(compose({ path: '/v.mp4' })).rejects.toThrow(/npm i @sylphx\/cue/);
   });
 });
+
+describe('instantiateSdk (class-with-create SDK shape)', () => {
+  test('instantiates and delegates read', async () => {
+    const { instantiateSdk } = await import('../src/compose/composeVideoObjects.js');
+    class Fake {
+      static create() {
+        return new Fake();
+      }
+      async read(input: { path: string }) {
+        return { result: { ok: input.path } };
+      }
+    }
+    const sdk = instantiateSdk({ default: Fake });
+    const out = await sdk.read({ path: '/a' });
+    expect((out as { result?: { ok?: string } }).result?.ok).toBe('/a');
+  });
+
+  test('throws when SDK lacks create()', () => {
+    const { instantiateSdk } = require('../src/compose/composeVideoObjects.js');
+    expect(() => instantiateSdk({ default: {} })).toThrow(/no \.create\(\)/);
+  });
+});
