@@ -52,5 +52,13 @@ jobs:
             npm view "$NAME" version dist-tags --workspaces=false || true
             exit 0
           fi
-          npm publish --access public --workspaces=false
-          npm view "$NAME@$VER" version --workspaces=false
+          npm publish --access public --workspaces=false 2>/dev/null || npm publish --access public
+          for i in $(seq 1 24); do
+            if npm view "$NAME@$VER" version >/dev/null 2>&1; then
+              npm view "$NAME@$VER" version
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "publish returned success but registry view still lagging for $NAME@$VER" >&2
+          npm view "$NAME" version dist-tags || true
