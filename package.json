@@ -2,7 +2,7 @@
   "name": "@sylphx/smart-reader-mcp",
   "version": "0.2.5",
   "mcpName": "io.github.SylphxAI/smart-reader-mcp",
-  "description": "Prism — local media router for agents (Sylphx). Sniff + delegate to Citra/Iris/Cue. One MCP call reads PDF, image, or video by sniffing format and delegating to Sylphx Reader siblings.",
+  "description": "Prism \u2014 local media router for agents (Sylphx). Sniff + delegate to Citra/Iris/Cue. One MCP call reads PDF, image, or video by sniffing format and delegating to Sylphx Reader siblings.",
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -65,7 +65,8 @@
     "prepublishOnly": "bun run clean && bun run build && bun run build:rust",
     "release": "bun scripts/sync-platform-versions.ts && bun scripts/publish-platform-packages.ts && bun run typecheck && bun run check && bun run build && bun test && changeset publish",
     "benchmark:public-proof": "bun scripts/public-proof.ts",
-    "brand:pack-plan": "bun scripts/brand-pack-plan.ts"
+    "brand:pack-plan": "bun scripts/brand-pack-plan.ts",
+    "compose:video": "bun src/compose/composeVideoObjects.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -78,7 +79,9 @@
     "@sylphx/smart-reader-mcp-darwin-arm64": "0.2.5",
     "@sylphx/smart-reader-mcp-darwin-x64": "0.2.5",
     "@sylphx/smart-reader-mcp-linux-x64-gnu": "0.2.5",
-    "@sylphx/smart-reader-mcp-linux-arm64-gnu": "0.2.5"
+    "@sylphx/smart-reader-mcp-linux-arm64-gnu": "0.2.5",
+    "@sylphx/iris": "^0.1.9",
+    "@sylphx/cue": "^0.1.7"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
