@@ -66,7 +66,7 @@
     "release": "bun scripts/sync-platform-versions.ts && bun scripts/publish-platform-packages.ts && bun run typecheck && bun run check && bun run build && bun test && changeset publish",
     "benchmark:public-proof": "bun scripts/public-proof.ts",
     "brand:pack-plan": "bun scripts/brand-pack-plan.ts",
-    "compose:video": "bun src/compose/composeVideoObjects.ts"
+    "compose:video": "bun src/compose/cli.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
