@@ -79,3 +79,16 @@ describe('Prism embedded video→objects compose (SDK-first, boundary)', () => {
     expect(out.warnings.some((w) => w.includes('iris sdk read failed'))).toBe(true);
   });
 });
+
+describe('Prism composeVideo SDK load failure (honest degrade)', () => {
+  test('rejects with actionable message when Cue SDK missing', async () => {
+    const compose = createComposeVideoObjects({
+      loadCue: async () => {
+        throw new Error('composeVideo requires the Cue SDK. Install it with: npm i @sylphx/cue.');
+      },
+      loadIris: async () => ({ read: async () => ({ result: {} }) }),
+      render: async () => {},
+    });
+    await expect(compose({ path: '/v.mp4' })).rejects.toThrow(/npm i @sylphx\/cue/);
+  });
+});

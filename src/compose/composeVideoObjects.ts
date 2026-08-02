@@ -80,13 +80,19 @@ export const createComposeVideoObjects = (deps: ComposeVideoDeps = {}) => {
   const loadCue =
     deps.loadCue ??
     (async () => {
-      const mod = await import('@sylphx/cue/sdk');
+      const mod = await import('@sylphx/cue/sdk').catch(() => {
+        throw new Error('composeVideo requires the Cue SDK. Install it with: npm i @sylphx/cue.');
+      });
       return (mod.default ?? mod) as unknown as CueSdkLike;
     });
   const loadIris =
     deps.loadIris ??
     (async () => {
-      const mod = await import('@sylphx/iris/sdk');
+      const mod = await import('@sylphx/iris/sdk').catch(() => {
+        throw new Error(
+          'composeVideo requires the Iris SDK. Install it with: npm i @sylphx/iris (or set IRIS_SEMANTICS_URL for a sidecar).'
+        );
+      });
       return (mod.default ?? mod) as unknown as IrisSdkLike;
     });
   const render =
