@@ -13,14 +13,14 @@ describe('resolveReaderLaunchSpec', () => {
     expect(READER_DELEGATION.image.toolName).toBe('read_image');
     expect(READER_DELEGATION.video.binName).toBe('video-reader-mcp');
     expect(READER_DELEGATION.pdf.contractVersion).toBe('4.1.2');
-    expect(READER_DELEGATION.image.contractVersion).toBe('0.1.8');
+    expect(READER_DELEGATION.image.contractVersion).toBe('0.1.9');
     expect(READER_DELEGATION.video.contractVersion).toBe('0.1.7');
   });
 
   test('pins npx fallback to optionalDependency versions for known siblings', () => {
     expect(buildNpxPackageSpecifier('@sylphx/pdf-reader-mcp')).toBe('@sylphx/pdf-reader-mcp@4.1.2');
     expect(buildNpxPackageSpecifier('@sylphx/image-reader-mcp')).toBe(
-      '@sylphx/image-reader-mcp@0.1.8'
+      '@sylphx/image-reader-mcp@0.1.9'
     );
     expect(buildNpxPackageSpecifier('@sylphx/video-reader-mcp')).toBe(
       '@sylphx/video-reader-mcp@0.1.7'
