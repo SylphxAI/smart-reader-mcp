@@ -1,6 +1,6 @@
 {
   "name": "@sylphx/smart-reader-mcp",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "mcpName": "io.github.SylphxAI/smart-reader-mcp",
   "description": "Prism \u2014 local media router for agents (Sylphx). Sniff + delegate to Citra/Iris/Cue. One MCP call reads PDF, image, or video by sniffing format and delegating to Sylphx Reader siblings.",
   "type": "module",
@@ -76,10 +76,10 @@
     "@sylphx/pdf-reader-mcp": "4.1.2",
     "@sylphx/image-reader-mcp": "0.1.8",
     "@sylphx/video-reader-mcp": "0.1.7",
-    "@sylphx/smart-reader-mcp-darwin-arm64": "0.2.5",
-    "@sylphx/smart-reader-mcp-darwin-x64": "0.2.5",
-    "@sylphx/smart-reader-mcp-linux-x64-gnu": "0.2.5",
-    "@sylphx/smart-reader-mcp-linux-arm64-gnu": "0.2.5",
+    "@sylphx/smart-reader-mcp-darwin-arm64": "0.2.6",
+    "@sylphx/smart-reader-mcp-darwin-x64": "0.2.6",
+    "@sylphx/smart-reader-mcp-linux-x64-gnu": "0.2.6",
+    "@sylphx/smart-reader-mcp-linux-arm64-gnu": "0.2.6",
     "@sylphx/iris": "^0.1.9",
     "@sylphx/cue": "^0.1.7"
   },
