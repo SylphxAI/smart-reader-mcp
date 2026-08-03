@@ -86,14 +86,25 @@ export function structuralKeyframeTimes(input: {
     }
   }
   const sorted = [...times].sort((a, b) => a - b);
-  if (sorted.length <= limit) return sorted;
-  const picked: number[] = [];
-  for (let i = 0; i < limit; i++) {
-    const idx = Math.round((i * (sorted.length - 1)) / Math.max(1, limit - 1));
-    const v = sorted[idx];
-    if (v !== undefined) picked.push(v);
+  if (sorted.length >= 1) {
+    if (sorted.length <= limit) return sorted;
+    const picked: number[] = [];
+    for (let i = 0; i < limit; i++) {
+      const idx = Math.round((i * (sorted.length - 1)) / Math.max(1, limit - 1));
+      const v = sorted[idx];
+      if (v !== undefined) picked.push(v);
+    }
+    return [...new Set(picked)].sort((a, b) => a - b);
   }
-  return [...new Set(picked)].sort((a, b) => a - b);
+  // No scene cuts: sample evenly across duration (I-frame-like fallback), else probe 0.
+  if (typeof input.durationMs === 'number' && input.durationMs > 0) {
+    const picked: number[] = [];
+    for (let i = 0; i < limit; i++) {
+      picked.push(Math.round((i * Math.max(0, input.durationMs - 1)) / Math.max(1, limit - 1)));
+    }
+    return [...new Set(picked)].sort((a, b) => a - b);
+  }
+  return [0];
 }
 
 export function instantiateSdk(mod: unknown): {

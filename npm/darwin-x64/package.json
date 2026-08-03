@@ -1,6 +1,6 @@
 {
   "name": "@sylphx/smart-reader-mcp-darwin-x64",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "Prism native MCP server for darwin-x64",
   "os": [
     "darwin"

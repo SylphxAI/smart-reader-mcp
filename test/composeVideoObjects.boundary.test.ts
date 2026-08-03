@@ -166,3 +166,19 @@ describe('defaultSdkLoader (shared loader path)', () => {
     await expect(loader()).rejects.toThrow(/npm i @sylphx\/cue/);
   });
 });
+
+describe('structuralKeyframeTimes no-scene fallback', () => {
+  test('samples evenly across duration when no scene cuts', () => {
+    const { structuralKeyframeTimes } = require('../src/compose/composeVideoObjects.js');
+    const times = structuralKeyframeTimes({ sceneTimesMs: [], durationMs: 4000, limit: 3 });
+    expect(times.length).toBeGreaterThan(0);
+    expect(times[0]).toBe(0);
+    expect(Math.max(...times)).toBeLessThan(4000);
+  });
+  test('returns [0] when neither scenes nor duration', () => {
+    const { structuralKeyframeTimes } = require('../src/compose/composeVideoObjects.js');
+    expect(structuralKeyframeTimes({ sceneTimesMs: [], durationMs: undefined, limit: 4 })).toEqual([
+      0,
+    ]);
+  });
+});
