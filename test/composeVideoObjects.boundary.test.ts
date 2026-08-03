@@ -149,10 +149,7 @@ describe('SDK MCP-text envelope parsing', () => {
 describe('defaultSdkLoader (shared loader path)', () => {
   test('loads an esm SDK module with create().read() and returns read fn', async () => {
     const { defaultSdkLoader } = await import('../src/compose/composeVideoObjects.js');
-    const { pathToFileURL } = await import('node:url');
-    const fixtureUrl = pathToFileURL(
-      '/home/codex/src/github.com/SylphxAI/smart-reader-mcp/test/fixtures/fakesdk-esm.mjs'
-    );
+    const fixtureUrl = new URL('./fixtures/fakesdk-esm.mjs', import.meta.url);
     const loader = defaultSdkLoader(fixtureUrl.href, 'hint');
     const sdk = await loader();
     expect(typeof sdk.read).toBe('function');
