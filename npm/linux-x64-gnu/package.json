@@ -1,6 +1,6 @@
 {
   "name": "@sylphx/smart-reader-mcp-linux-x64-gnu",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Prism native MCP server for linux-x64-gnu",
   "os": [
     "linux"
