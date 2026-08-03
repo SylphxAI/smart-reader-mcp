@@ -145,3 +145,27 @@ describe('SDK MCP-text envelope parsing', () => {
     expect(out.total_objects).toBeGreaterThan(0);
   });
 });
+
+describe('defaultSdkLoader (shared loader path)', () => {
+  test('loads an esm SDK module with create().read() and returns read fn', async () => {
+    const { defaultSdkLoader } = await import('../src/compose/composeVideoObjects.js');
+    const { pathToFileURL } = await import('node:url');
+    const fixtureUrl = pathToFileURL(
+      '/home/codex/src/github.com/SylphxAI/smart-reader-mcp/test/fixtures/fakesdk-esm.mjs'
+    );
+    const loader = defaultSdkLoader(fixtureUrl.href, 'hint');
+    const sdk = await loader();
+    expect(typeof sdk.read).toBe('function');
+    const res = (await sdk.read({ path: '/v.mp4' })) as { type?: string; text?: string };
+    expect(res.type).toBe('text');
+  });
+
+  test('returns actionable hint when specifier missing', async () => {
+    const { defaultSdkLoader } = await import('../src/compose/composeVideoObjects.js');
+    const loader = defaultSdkLoader(
+      '@sylphx/__missing__/sdk',
+      'composeVideo requires the Cue SDK. Install it with: npm i @sylphx/cue.'
+    );
+    await expect(loader()).rejects.toThrow(/npm i @sylphx\/cue/);
+  });
+});

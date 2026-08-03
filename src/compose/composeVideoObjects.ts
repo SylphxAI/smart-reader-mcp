@@ -113,25 +113,30 @@ export function instantiateSdk(mod: unknown): {
   return { read: (input) => instance.read(input) };
 }
 
+export function defaultSdkLoader(specifier: string, hint: string) {
+  return async (): Promise<{
+    read: (input: { path: string; [k: string]: unknown }) => Promise<unknown>;
+  }> => {
+    const mod = await import(specifier).catch(() => {
+      throw new Error(hint);
+    });
+    return instantiateSdk(mod);
+  };
+}
+
 export const createComposeVideoObjects = (deps: ComposeVideoDeps = {}) => {
   const loadCue =
     deps.loadCue ??
-    (async () => {
-      const mod = await import('@sylphx/cue/sdk').catch(() => {
-        throw new Error('composeVideo requires the Cue SDK. Install it with: npm i @sylphx/cue.');
-      });
-      return (mod.default ?? mod) as unknown as CueSdkLike;
-    });
+    defaultSdkLoader(
+      '@sylphx/cue/sdk',
+      'composeVideo requires the Cue SDK. Install it with: npm i @sylphx/cue.'
+    );
   const loadIris =
     deps.loadIris ??
-    (async () => {
-      const mod = await import('@sylphx/iris/sdk').catch(() => {
-        throw new Error(
-          'composeVideo requires the Iris SDK. Install it with: npm i @sylphx/iris (or set IRIS_SEMANTICS_URL for a sidecar).'
-        );
-      });
-      return instantiateSdk(mod) as unknown as IrisSdkLike;
-    });
+    defaultSdkLoader(
+      '@sylphx/iris/sdk',
+      'composeVideo requires the Iris SDK. Install it with: npm i @sylphx/iris (or set IRIS_SEMANTICS_URL for a sidecar).'
+    );
   const render =
     deps.render ??
     (async (videoPath, timeMs, outPath) => {
