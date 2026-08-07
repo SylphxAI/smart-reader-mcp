@@ -18,4 +18,4 @@ npx @sylphx/iris
 npx @sylphx/cue
 ```
 
-Family law: SylphxAI/skills `instrument-family-standard`.
+Family law: SylphxAI/skills `apply-instrument-family`.

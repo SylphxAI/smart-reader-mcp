@@ -19,7 +19,7 @@ That composition belongs to the **agent host / skills**, not a seventh product.
 | Image evidence | **Iris** — `@sylphx/iris` / repo `image-reader-mcp` |
 | Video timeline | **Cue** — `@sylphx/cue` / repo `video-reader-mcp` |
 | Unknown media type | Host skill: sniff (magic bytes / extension) then call the matching instrument MCP |
-| Family law | `SylphxAI/skills` → `instrument-family-standard` + `docs/knowledge/instruments/INSTRUMENT-FAMILY-LAW.md` |
+| Family law | `SylphxAI/skills` → `apply-instrument-family` + `docs/knowledge/instruments/INSTRUMENT-FAMILY-LAW.md` |
 
 ## Why retired
 
