@@ -1,3 +1,7 @@
+## RETIRED
+
+Prism is retired as a product (2026-08-07). Use Citra/Iris/Cue + host composition.
+
 # Changelog
 
 ## 0.2.1

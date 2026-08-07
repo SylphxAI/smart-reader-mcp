@@ -87,9 +87,9 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     : null;
   addCheck(
     checks,
-    'marketplace:server_json_title_prism',
-    serverJson?.title === 'Prism',
-    'server.json marketplace title is Prism',
+    'marketplace:server_json_title_prism_retired',
+    typeof serverJson?.title === 'string' && /RETIRED/i.test(serverJson.title),
+    'server.json marketplace title marks Prism RETIRED',
     { title: serverJson?.title }
   );
 
@@ -279,8 +279,8 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
   addCheck(
     checks,
     'surface:agent_skill',
-    fileExists('skills/prism/SKILL.md'),
-    'Agent skill surface is present at skills/prism/SKILL.md'
+    fileExists('skills/media-route/SKILL.md') || fileExists('skills/prism/SKILL.md'),
+    'Host media-route skill or historical prism skill is present'
   );
 
   addCheck(
@@ -292,9 +292,9 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
 
   addCheck(
     checks,
-    'docs:brand_publish',
-    fileExists('docs/BRAND_PUBLISH.md'),
-    'Brand publish readiness doc is present'
+    'docs:retirement',
+    fileExists('docs/RETIREMENT.md') || fileExists('docs/BRAND_PUBLISH.md'),
+    'Retirement record or historical brand publish doc is present'
   );
 
   const passed = checks.filter((check) => check.status === 'passed').length;

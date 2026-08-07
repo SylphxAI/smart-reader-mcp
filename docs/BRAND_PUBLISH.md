@@ -1,30 +1,5 @@
-# Prism — brand npm publish (expand–contract)
+# Prism brand publish — RETIRED
 
-**Publish authority:** this repository only.
+Do **not** publish brand or transitional Prism packages for Instruments growth.
 
-| Field | Value |
-| --- | --- |
-| Brand | **Prism** |
-| Canonical brand npm id | `@sylphx/prism` |
-| Transitional npm id | `@sylphx/smart-reader-mcp` |
-| Marketplace title | Prism (`server.json`) |
-
-## Policy (expand → contract)
-
-1. **One codebase / one version** — never two products.
-2. **Expand:** dual-publish `@sylphx/smart-reader-mcp@X.Y.Z` and `@sylphx/prism@X.Y.Z` (same artifacts).
-3. **Contract (later):** `npm deprecate` transitional toward brand; keep bins as long as cheap.
-4. Workflow: `.github/workflows/publish-brand-alias.yml` (org `NPM_TOKEN`).
-
-## User install
-
-```bash
-# preferred
-npm i -g @sylphx/prism
-# transitional still valid during expand
-npm i -g @sylphx/smart-reader-mcp
-```
-
-## Authority
-
-No central Instruments monorepo. Brand alias ships only from this product repo.
+See [RETIREMENT.md](./RETIREMENT.md). Prefer Citra / Iris / Cue.
