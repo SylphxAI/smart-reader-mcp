@@ -23,23 +23,24 @@ const readerContractVersion = (packageName: string): string =>
   packageJson.optionalDependencies?.[packageName] ?? 'unpinned';
 
 export const READER_DELEGATION: Record<MediaCategory, ReaderDelegationConfig> = {
+  // Historical Prism archaeology only — product is RETIRED. Brand sibling packages.
   pdf: {
-    packageName: '@sylphx/pdf-reader-mcp',
-    binName: 'pdf-reader-mcp',
+    packageName: '@sylphx/citra',
+    binName: 'citra',
     toolName: 'read_pdf',
-    contractVersion: readerContractVersion('@sylphx/pdf-reader-mcp'),
+    contractVersion: '5.0.0',
   },
   image: {
-    packageName: '@sylphx/image-reader-mcp',
-    binName: 'image-reader-mcp',
+    packageName: '@sylphx/iris',
+    binName: 'iris',
     toolName: 'read_image',
-    contractVersion: readerContractVersion('@sylphx/image-reader-mcp'),
+    contractVersion: '0.2.0',
   },
   video: {
-    packageName: '@sylphx/video-reader-mcp',
-    binName: 'video-reader-mcp',
+    packageName: '@sylphx/cue',
+    binName: 'cue',
     toolName: 'read_video',
-    contractVersion: readerContractVersion('@sylphx/video-reader-mcp'),
+    contractVersion: '0.2.0',
   },
 };
 

@@ -52,7 +52,7 @@ describe('Prism → Citra delegation e2e', () => {
       };
       expect(envelope.route?.delegation ?? envelope.delegation?.delegated_tool).toBe('read_pdf');
       expect(envelope.locator?.detectedFormat).toBe('pdf');
-      expect(envelope.delegation?.reader_package).toBe('@sylphx/pdf-reader-mcp');
+      expect(envelope.delegation?.reader_package).toBe('@sylphx/citra');
       const s = JSON.stringify(envelope);
       expect(s.length).toBeGreaterThan(100);
     },

@@ -63,13 +63,12 @@ const probeRustSniffCli = (): DoctorCheck => {
     }
   }
 
-  const release = path.join(here, '../target/release/smart-reader-cli');
-  const debug = path.join(here, '../target/debug/smart-reader-cli');
-  if (existsSync(release) || existsSync(debug)) {
+  // resolveRustCliBinary already honors CARGO_TARGET_DIR + default target/.
+  if (isRustCliAvailable()) {
     return {
       id: 'rust_sniff_cli',
       status: 'ok',
-      message: 'Rust sniff CLI is built locally.',
+      message: `Rust sniff CLI is built locally at ${resolveRustCliBinary()}.`,
     };
   }
 

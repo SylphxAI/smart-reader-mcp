@@ -3,7 +3,11 @@ import path from 'node:path';
 import { execSync, spawnSync } from 'node:child_process';
 import { DELEGATION_CONTRACT_VERSION } from '../src/delegate/delegationContract.js';
 import { runDoctor } from '../src/doctor.js';
-import { isRustCliAvailable, sniffFormatViaRustEngine } from '../src/engine/rust-sniff.js';
+import {
+  isRustCliAvailable,
+  resolveRustCliBinary,
+  sniffFormatViaRustEngine,
+} from '../src/engine/rust-sniff.js';
 
 const ARTIFACT_DIR_ENV = 'MCP_SMART_READER_BENCHMARK_OUTPUT_DIR';
 const DEFAULT_ARTIFACT_DIR = 'benchmark-artifacts';
@@ -170,10 +174,18 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     'Rust smart-reader-core path policy engine is present'
   );
 
+  let cargoBuildError: string | undefined;
   try {
-    execSync('cargo build --release', { cwd: repoRoot, stdio: 'pipe', timeout: 120_000 });
-  } catch {
-    // Release gate will report boundary failure if the CLI is still unavailable.
+    execSync('cargo build --release -p smart-reader-cli -p smart-reader-core -p smart-reader-mcp-server', {
+      cwd: repoRoot,
+      stdio: 'pipe',
+      timeout: 180_000,
+    });
+  } catch (error) {
+    cargoBuildError =
+      error instanceof Error
+        ? error.message
+        : 'cargo build --release failed for smart-reader workspace members';
   }
 
   const doctor = runDoctor(pkg.version);
@@ -190,18 +202,24 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     'doctor:rust_sniff_default',
     doctor.checks.find((check) => check.id === 'rust_sniff_default')?.status === 'ok',
     'doctor reports Rust sniff/policy routing is enabled by default when the CLI is built',
-    { rustCliAvailable: isRustCliAvailable() }
+    { rustCliAvailable: isRustCliAvailable(), cargoBuildError }
   );
 
   const mislabeledFixture = path.join(repoRoot, 'test/fixtures/mislabeled/png-as-pdf.pdf');
   let mislabeledFormat: string | undefined;
+  let mislabeledError: string | undefined;
   try {
-    if (isRustCliAvailable()) {
+    if (!fileExists('test/fixtures/mislabeled/png-as-pdf.pdf')) {
+      mislabeledError = 'fixture missing from workspace checkout';
+    } else if (isRustCliAvailable()) {
       const sniffed = sniffFormatViaRustEngine(mislabeledFixture);
       mislabeledFormat = sniffed.format;
+    } else {
+      mislabeledError = 'smart-reader-cli binary unavailable after cargo build';
     }
-  } catch {
+  } catch (error) {
     mislabeledFormat = undefined;
+    mislabeledError = error instanceof Error ? error.message : String(error);
   }
 
   addCheck(
@@ -209,7 +227,14 @@ export function buildReleaseGateReport(artifactDir: string): ReleaseGateReport {
     'boundary:rust_sniff_mislabeled',
     mislabeledFormat === 'image/png',
     'Rust sniff engine routes mislabeled png-as-pdf.pdf to image/png by magic bytes',
-    { detectedFormat: mislabeledFormat }
+    {
+      detectedFormat: mislabeledFormat,
+      fixture: mislabeledFixture,
+      fixturePresent: fileExists('test/fixtures/mislabeled/png-as-pdf.pdf'),
+      rustCli: resolveRustCliBinary(),
+      error: mislabeledError,
+      cargoBuildError,
+    }
   );
 
   const sampleEnvelope = readJson('examples/sample-envelope.json') as {

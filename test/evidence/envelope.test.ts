@@ -18,9 +18,9 @@ describe('agent evidence envelope', () => {
       sourcePath: '/tmp/report.pdf',
       launch: {
         command: process.execPath,
-        args: ['/tmp/pdf-reader-mcp'],
+        args: ['/tmp/citra'],
         source: 'local',
-        packageName: '@sylphx/pdf-reader-mcp',
+        packageName: '@sylphx/citra',
       },
       selectedConfig: READER_DELEGATION.pdf,
     });
@@ -46,7 +46,7 @@ describe('agent evidence envelope', () => {
     expect(envelope.nextActions.length).toBeGreaterThan(0);
     expect(envelope.delegation.delegated_tool).toBe('read_pdf');
     expect(envelope.delegation.contract_version).toBe(DELEGATION_CONTRACT_VERSION);
-    expect(envelope.delegation.reader_package).toBe('@sylphx/pdf-reader-mcp');
+    expect(envelope.delegation.reader_package).toBe('@sylphx/citra');
     expect(envelope.routing.selected_category).toBe('pdf');
     expect(envelope.routing.alternatives).toHaveLength(2);
     expect(envelope.result).toEqual({ pages: 2 });

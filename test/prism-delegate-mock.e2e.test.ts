@@ -50,7 +50,7 @@ describe('Prism → mock sibling envelope e2e', () => {
     };
     expect(envelope.locator?.detectedFormat).toBe('pdf');
     expect(envelope.route?.delegation ?? envelope.delegation?.delegated_tool).toBe('read_pdf');
-    expect(envelope.delegation?.reader_package).toBe('@sylphx/pdf-reader-mcp');
+    expect(envelope.delegation?.reader_package).toBe('@sylphx/citra');
     expect(JSON.stringify(envelope)).toContain('mock');
   });
 
@@ -60,13 +60,13 @@ describe('Prism → mock sibling envelope e2e', () => {
         path: samplePng,
         formatIncludes: 'image',
         tool: 'read_image',
-        pkg: '@sylphx/image-reader-mcp',
+        pkg: '@sylphx/iris',
       },
       {
         path: sampleMp4,
         formatIncludes: 'video',
         tool: 'read_video',
-        pkg: '@sylphx/video-reader-mcp',
+        pkg: '@sylphx/cue',
       },
     ] as const;
     for (const c of cases) {

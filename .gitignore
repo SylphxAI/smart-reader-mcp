@@ -12,8 +12,10 @@ docs/.vitepress/dist
 
 # Test Reports
 test-report.junit.xml
+
+# Intentionally tracked: test/fixtures/mislabeled/png-as-pdf.pdf (magic-byte corpus)
 benchmark-artifacts/*.json
-test/fixtures/mislabeled/
+
 .vercel
 
 # Staged host native (built via bun run build:rust or release assemble)
