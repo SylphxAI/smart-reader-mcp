@@ -1,20 +1,24 @@
-# Smart Reader MCP
-
-One MCP call reads PDF, image, or video by sniffing format and delegating to Sylphx Reader siblings.
+# Prism / smart-reader-mcp — RETIRED
 
 ## Lifecycle
 
-- Lifecycle: `bootstrap`
-- Layer: `tooling`
-- Portfolio ADR: [ADR-0002](docs/adr/0002-reader-portfolio-architecture.md) (this repo)
-- SOTA family roadmap: [`docs/roadmap/sota-family-roadmap.md`](docs/roadmap/sota-family-roadmap.md)
+- Lifecycle: `retired`
+- Layer: `tooling` (historical)
+- Retirement date: 2026-08-07
+- Successor composition authority: agent host + skills + Citra/Iris/Cue public contracts
 
-## Goals
+## Goals (historical only)
 
-- Local-first MCP package with evidence-first read output and benchmark-gated releases.
-- Preserve provenance so agents can cite sources (page, frame, time, bbox).
+- Sniff local media and delegate to sibling readers.
 
-## Non-Goals
+## Non-Goals (current)
 
-- Hosted auth, billing, storage, tenancy, or customer data retention.
-- Default generative LLM vision/language for reading.
+- Active Instrument product status
+- Marketplace growth
+- Release train investment
+- Brand `@sylphx/prism` as a shipping product
+
+## Boundary
+
+This repository must not be treated as product SSOT for agent media routing.
+Family law SSOT: `SylphxAI/skills` instrument-family-standard.

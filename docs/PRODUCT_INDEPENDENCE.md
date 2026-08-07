@@ -1,13 +1,6 @@
-# Product independence
+# Product independence — RETIRED
 
-**Prism** (`smart-reader-mcp`) is an **independent product**.
+Prism is **retired**. It is not an independent active product SSOT.
 
-This repository is the only source of truth for marketplace listing, release train,
-package/CLI/MCP/SDK contracts, docs, tests, and stars.
-
-- No multi-product monorepo shipping
-- No `SylphxAI/instruments` authority (retired)
-- No archived `@sylphx/reader-evidence` control package
-- Composition with siblings is via **public contracts** only
-
-Company private thin map (internal): `SylphxAI/portfolio`.
+Composition of Citra/Iris/Cue is owned by the agent host and skills.
+Family law: `SylphxAI/skills` instrument-family-standard.
