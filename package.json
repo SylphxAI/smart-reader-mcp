@@ -2,7 +2,7 @@
   "name": "@sylphx/smart-reader-mcp",
   "version": "0.2.11",
   "mcpName": "io.github.SylphxAI/smart-reader-mcp",
-  "description": "RETIRED — Prism media router. Use Citra/Iris/Cue + host composition. Not an active Instrument.",
+  "description": "RETIRED \u2014 Prism media router. Use Citra/Iris/Cue + host composition. Not an active Instrument.",
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -74,17 +74,7 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^4.4.3"
   },
-  "optionalDependencies": {
-    "@sylphx/pdf-reader-mcp": "4.1.2",
-    "@sylphx/image-reader-mcp": "0.1.9",
-    "@sylphx/video-reader-mcp": "0.1.7",
-    "@sylphx/smart-reader-mcp-darwin-arm64": "0.2.11",
-    "@sylphx/smart-reader-mcp-darwin-x64": "0.2.11",
-    "@sylphx/smart-reader-mcp-linux-x64-gnu": "0.2.11",
-    "@sylphx/smart-reader-mcp-linux-arm64-gnu": "0.2.11",
-    "@sylphx/iris": "^0.1.9",
-    "@sylphx/cue": "^0.1.7"
-  },
+  "optionalDependencies": {},
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
     "@changesets/changelog-github": "^0.7.0",
