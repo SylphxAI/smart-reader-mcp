@@ -1,3 +1,5 @@
+> **Note (2026-08-07):** Prism/smart-reader-mcp is **retired**. Host composition replaces this product.
+
 # ADR-0002: Sylphx Reader Portfolio Architecture
 
 **Status:** Accepted  
@@ -17,9 +19,9 @@ unified `read` tool — not in `pdf-reader-mcp`, which owns PDF only (see
 
 | Repository | Package | Role |
 |------------|---------|------|
-| pdf-reader-mcp | `@sylphx/pdf-reader-mcp` | PDF (production; independent project) |
-| image-reader-mcp | `@sylphx/image-reader-mcp` | Image read |
-| video-reader-mcp | `@sylphx/video-reader-mcp` | Video read |
+| pdf-reader-mcp (Citra) | `@sylphx/citra` | PDF (production; independent project) |
+| image-reader-mcp (Iris) | `@sylphx/iris` | Image read |
+| video-reader-mcp (Cue) | `@sylphx/cue` | Video read |
 | smart-reader-mcp | `@sylphx/smart-reader-mcp` | Sniff + delegate + unified `read` |
 
 **Phase 2 (later):** guarded local/remote path resolution stays in
