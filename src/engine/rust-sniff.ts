@@ -32,14 +32,22 @@ export function resolveRustCliBinary(): string {
     return env;
   }
 
-  const release = path.join(here, '../../target/release/smart-reader-cli');
-  if (existsSync(release)) {
-    return release;
-  }
+  const packageRoot = path.join(here, '../..');
+  const targetDir = process.env.CARGO_TARGET_DIR?.trim()
+    ? path.resolve(process.env.CARGO_TARGET_DIR)
+    : path.join(packageRoot, 'target');
 
-  const debug = path.join(here, '../../target/debug/smart-reader-cli');
-  if (existsSync(debug)) {
-    return debug;
+  const candidates = [
+    path.join(targetDir, 'release/smart-reader-cli'),
+    path.join(targetDir, 'debug/smart-reader-cli'),
+    // Fallback when CARGO_TARGET_DIR is set but workspace default also exists.
+    path.join(packageRoot, 'target/release/smart-reader-cli'),
+    path.join(packageRoot, 'target/debug/smart-reader-cli'),
+  ];
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) {
+      return candidate;
+    }
   }
 
   return 'smart-reader-cli';
