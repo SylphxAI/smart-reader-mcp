@@ -36,9 +36,9 @@ describe('readMedia handler', () => {
         raw_result: { pages: 1, title: 'mock' },
         launch: {
           command: process.execPath,
-          args: ['/tmp/pdf-reader-mcp'],
+          args: ['/tmp/citra'],
           source: 'local',
-          packageName: '@sylphx/pdf-reader-mcp',
+          packageName: '@sylphx/citra',
         },
       }),
     });
@@ -78,7 +78,7 @@ describe('readMedia handler', () => {
     expect(envelope.locator.detectedFormat).toBe('pdf');
     expect(envelope.delegation.delegated_tool).toBe('read_pdf');
     expect(envelope.delegation.contract_version).toBe('smart-reader-delegation-v1');
-    expect(envelope.delegation.reader_package).toBe('@sylphx/pdf-reader-mcp');
+    expect(envelope.delegation.reader_package).toBe('@sylphx/citra');
     expect(envelope.routing.selected_category).toBe('pdf');
     expect(envelope.routing.alternatives).toHaveLength(2);
     expect(envelope.route.delegation).toBe('read_pdf');
@@ -93,7 +93,7 @@ describe('readMedia handler', () => {
     const handler = createReadMediaHandler({
       sniffFormat: async () => pdfSniff(),
       delegateToReader: async () => {
-        throw new ReaderUnavailableError('pdf', '@sylphx/pdf-reader-mcp');
+        throw new ReaderUnavailableError('pdf', '@sylphx/citra');
       },
     });
 
@@ -104,7 +104,7 @@ describe('readMedia handler', () => {
 
     expect('isError' in result && result.isError).toBe(true);
     const textBlock = (result as { content: Array<{ text: string }> }).content[0];
-    expect(textBlock.text).toContain('@sylphx/pdf-reader-mcp');
+    expect(textBlock.text).toContain('@sylphx/citra');
     expect(textBlock.text).toContain('not available');
   });
 
@@ -122,7 +122,7 @@ describe('readMedia handler', () => {
           command: process.execPath,
           args: ['/tmp/image-reader-mcp'],
           source: 'local',
-          packageName: '@sylphx/image-reader-mcp',
+          packageName: '@sylphx/iris',
         },
       }),
     });

@@ -50,7 +50,7 @@ describe('Prism → Cue delegation e2e', () => {
       };
       expect(envelope.route?.delegation ?? envelope.delegation?.delegated_tool).toBe('read_video');
       expect(envelope.locator?.detectedFormat).toMatch(/mp4|video/);
-      expect(envelope.delegation?.reader_package).toBe('@sylphx/video-reader-mcp');
+      expect(envelope.delegation?.reader_package).toBe('@sylphx/cue');
       const s = JSON.stringify(envelope);
       expect(s).toMatch(/duration|streams|format/i);
     },

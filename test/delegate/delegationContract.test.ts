@@ -17,9 +17,9 @@ describe('delegation contract routing diagnostics', () => {
       sourcePath: '/tmp/report.pdf',
       launch: {
         command: process.execPath,
-        args: ['/tmp/pdf-reader-mcp'],
+        args: ['/tmp/citra'],
         source: 'local',
-        packageName: '@sylphx/pdf-reader-mcp',
+        packageName: '@sylphx/citra',
       },
       selectedConfig: READER_DELEGATION.pdf,
     });
@@ -47,13 +47,13 @@ describe('delegation contract routing diagnostics', () => {
         command: 'npx',
         args: ['-y', '@sylphx/image-reader-mcp@0.1.0'],
         source: 'npx',
-        packageName: '@sylphx/image-reader-mcp',
+        packageName: '@sylphx/iris',
       },
       selectedConfig: READER_DELEGATION.image,
     });
 
     expect(routing.selection_reason).toContain('overrides declared extension .pdf');
     expect(routing.launch_source).toBe('npx');
-    expect(routing.reader_package).toBe('@sylphx/image-reader-mcp');
+    expect(routing.reader_package).toBe('@sylphx/iris');
   });
 });

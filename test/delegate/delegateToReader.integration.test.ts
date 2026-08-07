@@ -27,7 +27,7 @@ describe('delegateToReader integration', () => {
         command: process.execPath,
         args: [videoReaderEntry],
         source: 'local',
-        packageName: '@sylphx/video-reader-mcp',
+        packageName: '@sylphx/cue',
       }),
       callTool: async ({ toolArgs }) => {
         capturedArgs = toolArgs;
@@ -59,7 +59,7 @@ describe('delegateToReader integration', () => {
         command: process.execPath,
         args: [videoReaderEntry],
         source: 'local',
-        packageName: '@sylphx/video-reader-mcp',
+        packageName: '@sylphx/cue',
       }),
     });
 

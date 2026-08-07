@@ -9,22 +9,18 @@ import {
 
 describe('resolveReaderLaunchSpec', () => {
   test('maps each media category to the expected sibling package', () => {
-    expect(READER_DELEGATION.pdf.packageName).toBe('@sylphx/pdf-reader-mcp');
+    expect(READER_DELEGATION.pdf.packageName).toBe('@sylphx/citra');
     expect(READER_DELEGATION.image.toolName).toBe('read_image');
-    expect(READER_DELEGATION.video.binName).toBe('video-reader-mcp');
-    expect(READER_DELEGATION.pdf.contractVersion).toBe('4.1.2');
-    expect(READER_DELEGATION.image.contractVersion).toBe('0.1.9');
-    expect(READER_DELEGATION.video.contractVersion).toBe('0.1.7');
+    expect(READER_DELEGATION.video.binName).toBe('cue');
+    expect(READER_DELEGATION.pdf.contractVersion).toBe('5.0.0');
+    expect(READER_DELEGATION.image.contractVersion).toBe('0.2.0');
+    expect(READER_DELEGATION.video.contractVersion).toBe('0.2.0');
   });
 
-  test('pins npx fallback to optionalDependency versions for known siblings', () => {
-    expect(buildNpxPackageSpecifier('@sylphx/pdf-reader-mcp')).toBe('@sylphx/pdf-reader-mcp@4.1.2');
-    expect(buildNpxPackageSpecifier('@sylphx/image-reader-mcp')).toBe(
-      '@sylphx/image-reader-mcp@0.1.9'
-    );
-    expect(buildNpxPackageSpecifier('@sylphx/video-reader-mcp')).toBe(
-      '@sylphx/video-reader-mcp@0.1.7'
-    );
+  test('npx fallback is unpinned when optionalDependencies are empty (retired product)', () => {
+    expect(buildNpxPackageSpecifier('@sylphx/citra')).toBe('@sylphx/citra');
+    expect(buildNpxPackageSpecifier('@sylphx/iris')).toBe('@sylphx/iris');
+    expect(buildNpxPackageSpecifier('@sylphx/cue')).toBe('@sylphx/cue');
   });
 
   test('returns npx launch spec when local package is unavailable', () => {
@@ -53,9 +49,9 @@ describe('delegateToReader', () => {
       sourcePath: '/tmp/report.pdf',
       resolveLaunchSpec: () => ({
         command: process.execPath,
-        args: ['/tmp/pdf-reader-mcp'],
+        args: ['/tmp/citra'],
         source: 'local',
-        packageName: '@sylphx/pdf-reader-mcp',
+        packageName: '@sylphx/citra',
       }),
       callTool: async ({ toolArgs }) => {
         capturedArgs = toolArgs;
@@ -78,7 +74,7 @@ describe('delegateToReader', () => {
         command: process.execPath,
         args: ['/tmp/video-reader-mcp'],
         source: 'local',
-        packageName: '@sylphx/video-reader-mcp',
+        packageName: '@sylphx/cue',
       }),
       callTool: async ({ toolArgs }) => {
         capturedArgs = toolArgs;
@@ -98,7 +94,7 @@ describe('delegateToReader', () => {
           command: process.execPath,
           args: ['/tmp/image-reader-mcp'],
           source: 'local',
-          packageName: '@sylphx/image-reader-mcp',
+          packageName: '@sylphx/iris',
         }),
         callTool: async () => {
           throw new Error('stdio handshake failed');

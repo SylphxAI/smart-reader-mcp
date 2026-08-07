@@ -55,7 +55,7 @@ describe('Prism → Iris delegation e2e', () => {
       expect(envelope.route?.delegation ?? envelope.delegation?.delegated_tool).toBe('read_image');
       expect(envelope.locator?.detectedFormat).toBe('image/png');
       expect(envelope.source).toContain('sample.png');
-      expect(envelope.delegation?.reader_package).toBe('@sylphx/image-reader-mcp');
+      expect(envelope.delegation?.reader_package).toBe('@sylphx/iris');
       // sibling payload present under common keys
       const s = JSON.stringify(envelope);
       expect(s).toMatch(/dimensions|width|height/i);

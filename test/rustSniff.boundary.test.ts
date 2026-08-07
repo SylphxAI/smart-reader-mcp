@@ -66,7 +66,7 @@ describe('rust sniff engine boundary', () => {
           command: process.execPath,
           args: ['/tmp/image-reader-mcp'],
           source: 'local',
-          packageName: '@sylphx/image-reader-mcp',
+          packageName: '@sylphx/iris',
         },
       }),
     });
