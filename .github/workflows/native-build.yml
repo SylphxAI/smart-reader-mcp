@@ -1,74 +1,26 @@
-name: Native build (legacy path)
+name: native-build
 
-# Prefer native-multiarch.yml for production multi-arch natives.
-# This workflow remains dispatch-only with static owned runners for ad-hoc single builds.
+# RETIRED product (Prism / smart-reader-mcp). No further public publishes.
+# Host owns composition of Citra/Iris/Cue. See README.
 
 on:
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type RETIRED (workflow intentionally fails closed)'
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 jobs:
-  build-linux-x64:
+  retired:
     runs-on: sylphx-linux-standard
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-unknown-linux-gnu
-      - name: Build
+      - name: Prism product publish retired
         run: |
           set -euo pipefail
-          cargo build --release -p smart-reader-mcp-server --target x86_64-unknown-linux-gnu
-          test -f target/x86_64-unknown-linux-gnu/release/smart-reader-mcp-server
-      - uses: actions/upload-artifact@v4
-        with:
-          name: native-linux-x64-gnu
-          path: target/x86_64-unknown-linux-gnu/release/smart-reader-mcp-server
-
-  build-linux-arm64:
-    runs-on: sylphx-linux-standard
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-unknown-linux-gnu
-      - uses: mlugg/setup-zig@v2
-        with:
-          version: 0.14.1
-      - name: Build via zig
-        run: |
-          set -euo pipefail
-          cargo install cargo-zigbuild --version 0.23.0 --locked
-          cargo zigbuild --release -p smart-reader-mcp-server --target aarch64-unknown-linux-gnu.2.17
-          test -f target/aarch64-unknown-linux-gnu/release/smart-reader-mcp-server
-      - uses: actions/upload-artifact@v4
-        with:
-          name: native-linux-arm64-gnu
-          path: target/aarch64-unknown-linux-gnu/release/smart-reader-mcp-server
-
-  build-darwin:
-    runs-on: [self-hosted, sylphx, macos, standard]
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: aarch64-apple-darwin
-            key: darwin-arm64
-          - target: x86_64-apple-darwin
-            key: darwin-x64
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
-      - name: Build
-        run: |
-          set -euo pipefail
-          cargo build --release -p smart-reader-mcp-server --target ${{ matrix.target }}
-          test -f target/${{ matrix.target }}/release/smart-reader-mcp-server
-      - uses: actions/upload-artifact@v4
-        with:
-          name: native-${{ matrix.key }}
-          path: target/${{ matrix.target }}/release/smart-reader-mcp-server
+          echo "::error::native-build is retired. Prism is not an Instrument product."
+          echo "Use @sylphx/citra, @sylphx/iris, @sylphx/cue via host composition."
+          exit 1

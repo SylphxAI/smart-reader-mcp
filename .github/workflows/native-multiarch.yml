@@ -1,189 +1,26 @@
-name: Native multi-arch build
+name: native-multiarch
+
+# RETIRED product (Prism / smart-reader-mcp). No further public publishes.
+# Host owns composition of Citra/Iris/Cue. See README.
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'crates/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'npm/**'
-      - '.github/workflows/native-multiarch.yml'
+    inputs:
+      confirm:
+        description: 'Type RETIRED (workflow intentionally fails closed)'
+        required: true
+        type: string
 
 permissions:
   contents: read
 
-# Static owned runners only (no dynamic matrix host).
-# linux-arm64 via zig cross on sylphx-linux-standard (Locus pattern).
-
 jobs:
-  build-darwin-arm64:
-    name: Build darwin-arm64
-    runs-on: [self-hosted, sylphx, macos, standard]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-apple-darwin
-      - name: Build release native
-        run: |
-          set -euo pipefail
-          cargo build --release -p smart-reader-mcp-server --target aarch64-apple-darwin
-          BIN="target/aarch64-apple-darwin/release/smart-reader-mcp-server"
-          test -f "$BIN"
-          chmod +x "$BIN"
-          test "$(wc -c < "$BIN")" -gt 100000
-          mkdir -p native-out
-          cp "$BIN" native-out/smart-reader-mcp-server
-          file native-out/smart-reader-mcp-server || true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: native-darwin-arm64
-          path: native-out/smart-reader-mcp-server
-          if-no-files-found: error
-          retention-days: 7
-
-  build-darwin-x64:
-    name: Build darwin-x64
-    runs-on: [self-hosted, sylphx, macos, standard]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-apple-darwin
-      - name: Build release native
-        run: |
-          set -euo pipefail
-          cargo build --release -p smart-reader-mcp-server --target x86_64-apple-darwin
-          BIN="target/x86_64-apple-darwin/release/smart-reader-mcp-server"
-          test -f "$BIN"
-          chmod +x "$BIN"
-          test "$(wc -c < "$BIN")" -gt 100000
-          mkdir -p native-out
-          cp "$BIN" native-out/smart-reader-mcp-server
-          file native-out/smart-reader-mcp-server || true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: native-darwin-x64
-          path: native-out/smart-reader-mcp-server
-          if-no-files-found: error
-          retention-days: 7
-
-  build-linux-x64:
-    name: Build linux-x64-gnu
+  retired:
     runs-on: sylphx-linux-standard
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-unknown-linux-gnu
-      - name: Build release native
+      - name: Prism product publish retired
         run: |
           set -euo pipefail
-          cargo build --release -p smart-reader-mcp-server --target x86_64-unknown-linux-gnu
-          BIN="target/x86_64-unknown-linux-gnu/release/smart-reader-mcp-server"
-          test -f "$BIN"
-          chmod +x "$BIN"
-          test "$(wc -c < "$BIN")" -gt 100000
-          mkdir -p native-out
-          cp "$BIN" native-out/smart-reader-mcp-server
-          file native-out/smart-reader-mcp-server || true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: native-linux-x64-gnu
-          path: native-out/smart-reader-mcp-server
-          if-no-files-found: error
-          retention-days: 7
-
-  build-linux-arm64:
-    name: Build linux-arm64-gnu (zig cross)
-    runs-on: sylphx-linux-standard
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-unknown-linux-gnu
-      - name: Setup Zig
-        uses: mlugg/setup-zig@v2
-        with:
-          version: 0.14.1
-      - name: Install cargo-zigbuild
-        run: cargo install cargo-zigbuild --version 0.23.0 --locked
-      - name: Build release native via zig
-        run: |
-          set -euo pipefail
-          cargo zigbuild --release -p smart-reader-mcp-server --target aarch64-unknown-linux-gnu.2.17
-          BIN="target/aarch64-unknown-linux-gnu/release/smart-reader-mcp-server"
-          if [[ ! -f "$BIN" ]]; then
-            BIN=$(find target -name 'smart-reader-mcp-server' -type f | head -1)
-          fi
-          test -n "$BIN" && test -f "$BIN"
-          chmod +x "$BIN"
-          test "$(wc -c < "$BIN")" -gt 100000
-          mkdir -p native-out
-          cp "$BIN" native-out/smart-reader-mcp-server
-          file native-out/smart-reader-mcp-server || true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: native-linux-arm64-gnu
-          path: native-out/smart-reader-mcp-server
-          if-no-files-found: error
-          retention-days: 7
-
-  publish:
-    needs: [build-darwin-arm64, build-darwin-x64, build-linux-x64, build-linux-arm64]
-    if: github.event_name == 'workflow_dispatch' && !cancelled() && needs.build-darwin-arm64.result != 'cancelled' && needs.build-darwin-x64.result != 'cancelled' && needs.build-linux-x64.result != 'cancelled' && needs.build-linux-arm64.result != 'cancelled'
-    runs-on: sylphx-linux-standard
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          registry-url: https://registry.npmjs.org
-          always-auth: true
-      - uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-      - name: Stage + publish platform packages
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          set -euo pipefail
-          TOKEN="${NODE_AUTH_TOKEN:-$NPM_TOKEN}"
-          test -n "$TOKEN"
-          printf '//registry.npmjs.org/:_authToken=%s\nalways-auth=true\n' "$TOKEN" > "$HOME/.npmrc"
-          export NPM_CONFIG_USERCONFIG="$HOME/.npmrc"
-          unset npm_config_workspace || true
-          unset npm_config_workspaces || true
-          npm whoami
-          VER=$(node -p "require('./package.json').version")
-          echo "product version $VER"
-          ls -laR artifacts
-          for key in darwin-arm64 darwin-x64 linux-x64-gnu linux-arm64-gnu; do
-            src=$(find artifacts -path "*native-$key*" -name 'smart-reader-mcp-server' | head -1 || true)
-            dir="npm/$key"
-            if [[ -z "$src" || ! -f "$src" ]]; then
-              echo "missing artifact for $key"
-              exit 1
-            fi
-            mkdir -p "$dir"
-            cp "$src" "$dir/smart-reader-mcp-server"
-            chmod +x "$dir/smart-reader-mcp-server"
-            if [[ -f "$dir/package.json" ]]; then
-              node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));p.version=process.argv[2];fs.writeFileSync(process.argv[1],JSON.stringify(p,null,2)+'\n')" "$dir/package.json" "$VER"
-            fi
-            name=$(node -p "require('./$dir/package.json').name")
-            if npm view "$name@$VER" version >/dev/null 2>&1; then
-              echo already "$name@$VER"
-              continue
-            fi
-            echo "Publishing $name@$VER"
-            (cd "$dir" && npm publish --access public) 2>&1 | tee /tmp/pub-$key.log
-            for i in $(seq 1 24); do
-              npm view "$name@$VER" version >/dev/null 2>&1 && break
-              sleep 5
-            done
-            npm view "$name@$VER" version
-          done
+          echo "::error::native-multiarch is retired. Prism is not an Instrument product."
+          echo "Use @sylphx/citra, @sylphx/iris, @sylphx/cue via host composition."
+          exit 1

@@ -2,10 +2,10 @@
   "name": "@sylphx/smart-reader-mcp",
   "version": "0.2.11",
   "mcpName": "io.github.SylphxAI/smart-reader-mcp",
-  "description": "RETIRED \u2014 Prism media router. Use Citra/Iris/Cue + host composition. Not an active Instrument.",
+  "description": "RETIRED \u2014 Prism / smart-reader-mcp (not a product). Host composition only.",
   "type": "module",
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   },
   "license": "MIT",
   "bin": {
