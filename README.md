@@ -15,9 +15,9 @@ That composition belongs to the **agent host / skills**, not a seventh product.
 
 | Need | Authority |
 | --- | --- |
-| PDF evidence | **Citra** — `@sylphx/citra` / repo `pdf-reader-mcp` |
-| Image evidence | **Iris** — `@sylphx/iris` / repo `image-reader-mcp` |
-| Video timeline | **Cue** — `@sylphx/cue` / repo `video-reader-mcp` |
+| PDF evidence | **Citra** — `@sylphx/citra` / [SylphxAI/citra](https://github.com/SylphxAI/citra) |
+| Image evidence | **Iris** — `@sylphx/iris` / [SylphxAI/iris](https://github.com/SylphxAI/iris) |
+| Video timeline | **Cue** — `@sylphx/cue` / [SylphxAI/cue](https://github.com/SylphxAI/cue) |
 | Unknown media type | Host skill: sniff (magic bytes / extension) then call the matching instrument MCP |
 | Family law | `SylphxAI/skills` → `apply-instrument-family` + `docs/knowledge/instruments/INSTRUMENT-FAMILY-LAW.md` |
 

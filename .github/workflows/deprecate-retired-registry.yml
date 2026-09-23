@@ -1,0 +1,72 @@
+name: Deprecate retired MCP registry identity
+
+# Prism is retired. This workflow only marks the old registry record deprecated.
+# It does not publish a package or a new registry version.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deprecate:
+    runs-on: sylphx-linux-standard
+    steps:
+      - name: Install pinned mcp-publisher
+        run: |
+          set -euo pipefail
+          PUBLISHER_VERSION='v1.8.1'
+          case "$(uname -s)-$(uname -m)" in
+            Linux-x86_64)
+              ASSET='mcp-publisher_linux_amd64.tar.gz'
+              SHA256='a06c9096dcb9727c13555b6be26c7effa707b01f06a4c561ba7a3635443cf2cc'
+              ;;
+            Linux-aarch64|Linux-arm64)
+              ASSET='mcp-publisher_linux_arm64.tar.gz'
+              SHA256='8dd75a6cf6845688b5d4e46df58d3ca26d5c8d233bb0626606e1db82c5e883e4'
+              ;;
+            *)
+              echo "Unsupported publisher host: $(uname -s)-$(uname -m)" >&2
+              exit 1
+              ;;
+          esac
+          ARCHIVE="$RUNNER_TEMP/$ASSET"
+          curl --proto '=https' --tlsv1.2 -fsSLo "$ARCHIVE" \
+            "https://github.com/modelcontextprotocol/registry/releases/download/${PUBLISHER_VERSION}/${ASSET}"
+          echo "$SHA256  $ARCHIVE" | sha256sum -c -
+          tar -xzf "$ARCHIVE" mcp-publisher
+
+      - name: Authenticate to MCP Registry
+        run: ./mcp-publisher login github-oidc
+
+      - name: Deprecate retired MCP Registry identity
+        run: |
+          set -euo pipefail
+          if ! out=$(./mcp-publisher status \
+              --status deprecated \
+              --all-versions \
+              --yes \
+              --message 'Retired. Read PDF with io.github.SylphxAI/citra, images with io.github.SylphxAI/iris, and video with io.github.SylphxAI/cue.' \
+              io.github.SylphxAI/smart-reader-mcp 2>&1); then
+            if grep -qE 'already set to the provided values|No changes to apply' <<<"$out"; then
+              echo "Retired identity already deprecated; nothing to do"
+            else
+              echo "$out" >&2
+              exit 1
+            fi
+          fi
+          URL='https://registry.modelcontextprotocol.io/v0.1/servers/io.github.SylphxAI%2Fsmart-reader-mcp/versions/latest'
+          for attempt in $(seq 1 24); do
+            if curl -fsS "$URL" > "$RUNNER_TEMP/retired-registry.json" && \
+              jq -e '._meta["io.modelcontextprotocol.registry/official"].status == "deprecated"' \
+                "$RUNNER_TEMP/retired-registry.json" >/dev/null; then
+              cat "$RUNNER_TEMP/retired-registry.json"
+              exit 0
+            fi
+            echo "MCP Registry deprecation readback wait $attempt"
+            sleep 5
+          done
+          echo "Retired registry identity deprecation readback failed" >&2
+          exit 1
